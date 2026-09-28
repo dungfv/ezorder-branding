@@ -148,7 +148,6 @@ content:
       - { name: appStoreUrl, label: Shopify App Store URL, type: string }
       - { name: appUrl, label: App URL, type: string }
       - { name: docsUrl, label: Documentation URL (empty hides every Docs link), type: string }
-      - { name: privacyPolicyUrl, label: App privacy policy URL, type: string }
       - { name: supportEmail, label: Support email, type: string }
       - { name: companyName, label: Company name, type: string }
       - { name: twitterHandle, label: X / Twitter handle (e.g. @ezorder), type: string }

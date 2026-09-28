@@ -22,7 +22,6 @@ const SiteSchema = z.object({
   appUrl: optionalUrl,
   /** Empty = no docs site yet: Docs links are hidden everywhere. */
   docsUrl: optionalUrl,
-  privacyPolicyUrl: z.url(),
   supportEmail: z.email(),
   companyName: z.string().min(1),
   twitterHandle: optionalText,
