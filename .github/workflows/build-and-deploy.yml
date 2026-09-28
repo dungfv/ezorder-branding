@@ -1,9 +1,12 @@
 # Every push and PR: type-check + build (catches content that would break the site,
 # e.g. a Pages CMS edit on a branch). Pushes to main: also deploy to S3 + CloudFront.
 #
-# Repository variables (Settings → Secrets and variables → Actions → Variables),
-# values come from the CloudFormation stack outputs (infra/cloudformation-website-hosting.yml):
+# Variables live in the GitHub environment "production" (Settings → Environments →
+# production → Environment variables), restricted to the main branch:
 #   AWS_REGION, AWS_DEPLOY_ROLE_ARN, S3_BUCKET, CLOUDFRONT_DISTRIBUTION_ID
+# Only a job that declares `environment: production` can read them. That also changes
+# the OIDC subject to repo:<owner>/<repo>:environment:production, which the IAM role's
+# trust policy must match.
 name: Build and deploy
 
 on:
@@ -37,6 +40,7 @@ jobs:
     needs: build
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: production
     # Never run two deploys at once; a newer push waits for the current one.
     concurrency:
       group: deploy-production

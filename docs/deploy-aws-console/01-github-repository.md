@@ -3,12 +3,12 @@
 ## 1.1 Tạo repo
 
 1. github.com → **New repository**.
-2. Owner: tổ chức của bạn (vd `uppush`). Repository name: vd `ezorder-website`.
+2. Owner: tài khoản hoặc tổ chức của bạn (repo hiện tại: `dungfv`). Repository name: `ezorder-branding`.
 3. Visibility: **Private** (Pages CMS và GitHub Actions đều chạy với repo private).
 4. **Không** tick "Add a README", ".gitignore", "license" (repo local đã có sẵn).
 5. **Create repository**.
 
-Ghi `owner/repo` (vd `uppush/ezorder-website`) vào bảng giá trị. Viết **đúng chữ hoa/thường**, vì IAM role ở bước 6 so khớp chính xác chuỗi này.
+Ghi `owner/repo` (repo hiện tại: `dungfv/ezorder-branding`) vào bảng giá trị. Viết **đúng chữ hoa/thường**, vì IAM role ở bước 6 so khớp chính xác chuỗi này.
 
 ## 1.2 Push code từ máy
 
@@ -38,5 +38,7 @@ Settings → **Rules → Rulesets** (hoặc Branches → Branch protection rules
 Settings → **Actions → General**:
 - Actions permissions: **Allow all actions** (hoặc ít nhất cho phép `actions/*` và `aws-actions/*`).
 - Workflow permissions: để mặc định **Read repository contents**. Workflow tự khai báo quyền `id-token: write` cho riêng job deploy.
+
+Environment `production` (chứa các biến deploy) được tạo ở [bước 7.1](07-github-variables-first-deploy.md#71-tạo-environment-production-và-thêm-4-biến).
 
 ➡️ Tiếp theo: [Bước 2 — Chứng chỉ ACM](02-acm-certificate.md)

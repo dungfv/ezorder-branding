@@ -42,7 +42,8 @@ Không có giá trị nào dưới đây là bí mật, có thể ghi thẳng v�
 |---|---|---|---|
 | AWS Account ID (12 số) | Góc phải trên console | 4, 6 | |
 | Region của bucket (vd `us-west-1`) | 3 | 7 | |
-| GitHub repo (`owner/repo`) | 1 | 6 | |
+| GitHub repo (`owner/repo`) | 1 | 6 | `dungfv/ezorder-branding` |
+| GitHub environment | 7 | 6 | `production` |
 | ACM certificate ARN (us-east-1) | 2 | 4 | |
 | S3 bucket name | 3 | 4, 6, 7 | |
 | CloudFront distribution ID (vd `E1ABC…`) | 4 | 6, 7 | |

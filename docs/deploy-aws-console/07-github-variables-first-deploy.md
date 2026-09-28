@@ -1,8 +1,15 @@
 # Bước 7 — Khai báo biến trên GitHub, deploy lần đầu, kiểm tra
 
-## 7.1 Thêm 4 biến
+## 7.1 Tạo environment `production` và thêm 4 biến
 
-Repo GitHub → **Settings** → **Secrets and variables** → **Actions** → tab **Variables** (⚠️ không phải tab Secrets) → **New repository variable**:
+Các biến deploy nằm trong **environment** `production`. Chỉ job có dòng `environment: production` (job `deploy` trong workflow) mới đọc được chúng.
+
+**Tạo environment:**
+1. Repo GitHub → **Settings** → **Environments** → **New environment** → Name: `production` (chữ thường, đúng chính tả) → **Configure environment**.
+2. Mục **Deployment branches and tags** → chọn **Selected branches and tags** → **Add deployment branch or tag rule** → nhập `main` → **Add rule**. ⚠️ Bước này thay cho giới hạn nhánh trong trust policy: thiếu nó thì workflow từ nhánh khác cũng mượn được role AWS.
+3. (Tuỳ chọn) **Required reviewers**: bật nếu muốn có người duyệt trước mỗi lần deploy. Lưu ý: bật thì bài lưu từ Pages CMS cũng phải chờ duyệt mới lên site.
+
+**Thêm biến:** vẫn trong trang environment `production` → mục **Environment variables** → **Add environment variable** (⚠️ không phải Environment secrets):
 
 | Name | Value (từ bảng giá trị) |
 |---|---|
@@ -13,13 +20,15 @@ Repo GitHub → **Settings** → **Secrets and variables** → **Actions** → t
 
 Không giá trị nào là bí mật, nên dùng **Variables**. Tên biến phải **đúng từng ký tự** như trên, vì workflow đọc `vars.AWS_REGION`, `vars.S3_BUCKET`…
 
+Nếu trước đó đã tạo biến trùng tên ở mức repository (tab Variables của *Secrets and variables → Actions*), hãy xoá đi để khỏi nhầm; biến của environment sẽ được ưu tiên.
+
 ## 7.2 Chạy deploy
 
 Tab **Actions** → workflow **Build and deploy** → **Run workflow** → Branch: `main` → **Run workflow**.
 
 Workflow (`.github/workflows/build-and-deploy.yml`) làm:
 1. **build**: `npm ci` → `npm run check` → `npm run build` (Astro + index Pagefind).
-2. **deploy** (chỉ khi push lên `main`):
+2. **deploy** (chỉ khi push lên `main`, chạy trong environment `production`):
    - Đăng nhập AWS bằng OIDC. Log bước *Configure AWS Credentials* sẽ hiện `Authenticated as assumedRoleId …`.
    - Upload `/_astro/*` trước với `Cache-Control: public,max-age=31536000,immutable` (file có hash trong tên, không bao giờ đổi).
    - Upload trang HTML, RSS, sitemap, Pagefind với `max-age=0, s-maxage=31536000`: trình duyệt luôn hỏi lại, CloudFront giữ cache đến lần deploy sau. Xoá khỏi bucket các trang đã bị xoá khỏi site.

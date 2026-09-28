@@ -5,7 +5,7 @@ Pages CMS là giao diện web để sửa nội dung. Mỗi lần bấm **Save**
 ## 8.1 Kết nối repo
 
 1. Mở [app.pagescms.org](https://app.pagescms.org) → **Sign in with GitHub**.
-2. Cài **Pages CMS GitHub App**: chọn tổ chức (vd `uppush`) → **Only select repositories** → chọn đúng repo website → **Install**. Chỉ cấp quyền cho repo này, không chọn "All repositories".
+2. Cài **Pages CMS GitHub App**: chọn tài khoản/tổ chức sở hữu repo (hiện tại `dungfv`) → **Only select repositories** → chọn đúng repo website → **Install**. Chỉ cấp quyền cho repo này, không chọn "All repositories".
 3. Quay lại Pages CMS → chọn repo → nhánh `main`.
 4. Menu trái sẽ có: **Blog**, **Pricing**, **Site settings**.
 

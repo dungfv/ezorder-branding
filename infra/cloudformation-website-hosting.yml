@@ -16,10 +16,13 @@ Parameters:
   GitHubRepository:
     Type: String
     AllowedPattern: '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'
-    Description: owner/repo that is allowed to deploy (e.g. uppush/ezorder-website).
-  DeployBranch:
+    Description: owner/repo that is allowed to deploy (e.g. dungfv/ezorder-branding).
+  DeployEnvironment:
     Type: String
-    Default: main
+    Default: production
+    Description: >
+      GitHub environment of the deploy job. Restrict it to the main branch in
+      GitHub (Settings → Environments → Deployment branches).
   ExistingGitHubOidcProviderArn:
     Type: String
     Default: ''
@@ -225,7 +228,7 @@ Resources:
   GitHubDeployRole:
     Type: AWS::IAM::Role
     Properties:
-      Description: !Sub 'Deploys ${DomainName} from ${GitHubRepository}@${DeployBranch}'
+      Description: !Sub 'Deploys ${DomainName} from ${GitHubRepository} (environment ${DeployEnvironment})'
       MaxSessionDuration: 3600
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -240,8 +243,9 @@ Resources:
             Condition:
               StringEquals:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
-                # Only pushes to the deploy branch (not PRs, not other branches) may deploy.
-                token.actions.githubusercontent.com:sub: !Sub 'repo:${GitHubRepository}:ref:refs/heads/${DeployBranch}'
+                # Jobs with `environment: <DeployEnvironment>` send this subject. The
+                # environment's branch rule (main only) keeps other branches out.
+                token.actions.githubusercontent.com:sub: !Sub 'repo:${GitHubRepository}:environment:${DeployEnvironment}'
       Policies:
         - PolicyName: deploy-site
           PolicyDocument:

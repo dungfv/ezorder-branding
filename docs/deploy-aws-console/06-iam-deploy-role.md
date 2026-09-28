@@ -1,7 +1,7 @@
 # Bước 6 — Tạo IAM role để GitHub Actions deploy
 
 Role gồm hai phần:
-- **Trust policy**: *ai* được mượn role. Ở đây là GitHub Actions, đúng repo, đúng nhánh `main`.
+- **Trust policy**: *ai* được mượn role. Ở đây là job GitHub Actions của đúng repo, chạy trong environment `production`.
 - **Permissions policy**: mượn xong được *làm gì*. Ở đây là upload lên bucket và tạo invalidation cho distribution.
 
 ## 6.1 Tạo role qua wizard
@@ -14,9 +14,11 @@ Role gồm hai phần:
 
 | Ô | Điền | Đừng điền |
 |---|---|---|
-| GitHub organization | `uppush` | `https://github.com/uppush`, có dấu cách |
-| GitHub repository | `ezorder-website` | `uppush/ezorder-website` |
+| GitHub organization | `dungfv` | `https://github.com/dungfv`, có dấu cách |
+| GitHub repository | `ezorder-branding` | `dungfv/ezorder-branding` |
 | GitHub branch | `main` | `refs/heads/main`, `*` |
+
+> Wizard sinh `sub` theo **nhánh** (`…:ref:refs/heads/main`). Workflow của ta chạy job deploy trong **environment** `production`, nên sau khi tạo xong **bắt buộc** sửa `sub` ở bước 6.3.
 
 6. **Next** → trang **Add permissions**: bỏ qua, không chọn gì → **Next**.
 7. **Role name**: `ezorder-website-github-deploy`. Description: tuỳ ý.
@@ -30,7 +32,7 @@ Dùng khi wizard lỗi. Create role → **Trusted entity type**: **Custom trust 
 
 ## 6.3 Kiểm tra trust policy
 
-Mở role → tab **Trust relationships** → **Edit trust policy**. Nội dung phải như dưới. Wizard có thể tạo `StringLike`; hãy đổi thành **`StringEquals`** để khoá đúng nhánh `main`:
+Mở role → tab **Trust relationships** → **Edit trust policy**. Nội dung phải **đúng như dưới**. Wizard tạo `sub` dạng `ref:refs/heads/main` và có thể dùng `StringLike`; hãy sửa `sub` thành dạng **environment** và dùng **`StringEquals`**:
 
 ```json
 {
@@ -45,7 +47,7 @@ Mở role → tab **Trust relationships** → **Edit trust policy**. Nội dung 
       "Condition": {
         "StringEquals": {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-          "token.actions.githubusercontent.com:sub": "repo:uppush/ezorder-website:ref:refs/heads/main"
+          "token.actions.githubusercontent.com:sub": "repo:dungfv/ezorder-branding:environment:production"
         }
       }
     }
@@ -54,7 +56,8 @@ Mở role → tab **Trust relationships** → **Edit trust policy**. Nội dung 
 ```
 
 - `<ACCOUNT_ID>`: 12 số tài khoản AWS.
-- `repo:uppush/ezorder-website:...`: đúng `owner/repo` ở bước 1, **phân biệt hoa/thường**.
+- `repo:dungfv/ezorder-branding:environment:production`: đúng `owner/repo` ở bước 1 và đúng tên environment ở bước 7.1, **phân biệt hoa/thường**.
+- Vì sao là `environment:production` chứ không phải `ref:refs/heads/main`: khi job có dòng `environment: production`, GitHub gửi `sub` theo environment. Giới hạn "chỉ nhánh `main`" được đặt ở phía GitHub (Deployment branches của environment, bước 7.1).
 - **Update policy**.
 
 ## 6.4 Gắn quyền deploy (inline policy)

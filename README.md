@@ -138,7 +138,7 @@ One-time setup, in this order. Nothing touches the live domain until step 7.
 
 ### 1. GitHub repository
 
-1. Create a repository (private is fine), e.g. `uppush/ezorder-website`, then push:
+1. Create a repository (private is fine), e.g. `dungfv/ezorder-branding`, then push:
    ```bash
    git remote add origin git@github.com:<owner>/<repo>.git
    git push -u origin main
@@ -162,10 +162,10 @@ AWS console → CloudFormation → Create stack → upload `infra/cloudformation
 | `DomainName` | `ezorder.io` |
 | `AcmCertificateArn` | ARN from step 2 |
 | `GitHubRepository` | `<owner>/<repo>` from step 1 |
-| `DeployBranch` | `main` |
+| `DeployEnvironment` | `production` (GitHub environment of the deploy job) |
 | `ExistingGitHubOidcProviderArn` | empty, **unless** the account already has an IAM identity provider for `token.actions.githubusercontent.com` (IAM → Identity providers); then paste its ARN |
 
-Acknowledge IAM resource creation and create. The stack builds: a private S3 bucket, CloudFront with Origin Access Control, a CloudFront Function (`www` → apex, `/about` → `/about/`, `/about/` → `index.html`), a response-headers policy (CSP, HSTS, `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`), 403/404 → `/404.html`, and an IAM role only `main` of your repo can assume. CLI alternative:
+Acknowledge IAM resource creation and create. The stack builds: a private S3 bucket, CloudFront with Origin Access Control, a CloudFront Function (`www` → apex, `/about` → `/about/`, `/about/` → `index.html`), a response-headers policy (CSP, HSTS, `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`), 403/404 → `/404.html`, and an IAM role that only the `production` environment of your repo can assume. CLI alternative:
 
 ```bash
 aws cloudformation deploy --stack-name ezorder-website \
@@ -173,9 +173,14 @@ aws cloudformation deploy --stack-name ezorder-website \
   --parameter-overrides AcmCertificateArn=<arn> GitHubRepository=<owner>/<repo>
 ```
 
-### 4. GitHub Actions variables
+### 4. GitHub environment and variables
 
-Repository → Settings → Secrets and variables → Actions → **Variables** (not secrets; none of these are sensitive):
+The deploy job runs in the GitHub environment **`production`**, so the IAM role trusts the OIDC subject `repo:<owner>/<repo>:environment:production`.
+
+1. Repository → Settings → **Environments** → New environment `production`.
+2. **Deployment branches and tags** → Selected branches → add `main`. This is what limits deploys to `main` (the role trusts the environment, not the branch).
+3. Optional: **Required reviewers** to approve each deploy (CMS saves then wait for approval too).
+4. **Environment variables** (not secrets; none of these are sensitive):
 
 | Variable | Value |
 |---|---|

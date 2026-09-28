@@ -6,14 +6,14 @@ Thay vì lưu access key dài hạn trên GitHub, ta cấu hình AWS để **tin
 
 ```
 1. Job deploy chạy  → GitHub cấp cho job một token (JWT) đã ký, ghi rõ:
-                      "tôi là repo uppush/ezorder-website, nhánh main"
+                      "tôi là repo dungfv/ezorder-branding, environment production"
 2. Action aws-actions/configure-aws-credentials gửi token + ARN role lên AWS STS
 3. AWS kiểm tra: chữ ký có đúng của GitHub không (nhờ Identity Provider ở bước này)
                  repo/nhánh có khớp trust policy của role không (bước 6)
 4. Khớp → AWS trả credentials tạm thời (hết hạn sau ~1 giờ) → aws s3 sync chạy
 ```
 
-Lợi ích: không có secret nào trên GitHub để lộ, không phải xoay vòng key. Role chỉ dùng được từ **đúng repo, đúng nhánh `main`**.
+Lợi ích: không có secret nào trên GitHub để lộ, không phải xoay vòng key. Role chỉ dùng được từ **đúng repo, đúng environment `production`** (environment này chỉ cho nhánh `main` deploy).
 
 **Identity Provider** là bước "cho AWS biết cần tin `token.actions.githubusercontent.com`". Mỗi tài khoản AWS chỉ có **một** provider này, dùng chung cho mọi repo GitHub.
 
