@@ -1,0 +1,63 @@
+---
+import Logo from './Logo.astro';
+import { footerNav, site, socialLinks } from '../../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-24 border-t border-line bg-surface">
+  <div class="container-page grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+    <div class="max-w-xs">
+      <Logo />
+      <p class="mt-4 text-sm leading-relaxed text-muted">{site.tagline}.</p>
+      <p class="mt-4 text-sm">
+        <a class="font-medium text-accent underline-offset-4 hover:underline" href={`mailto:${site.supportEmail}`}>
+          {site.supportEmail}
+        </a>
+      </p>
+    </div>
+
+    {
+      footerNav.map((column) => (
+        <nav aria-label={column.title}>
+          <h2 class="font-mono text-xs font-medium tracking-[0.14em] text-muted uppercase">{column.title}</h2>
+          <ul class="mt-4 space-y-2.5 text-sm">
+            {column.items.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="text-fg/85 transition-colors hover:text-accent"
+                  {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+  </div>
+
+  <div class="border-t border-line">
+    <div
+      class="container-page flex flex-col gap-3 py-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>© {year} {site.companyName}. All rights reserved.</p>
+      {
+        socialLinks.length > 0 && (
+          <ul class="flex gap-4">
+            {socialLinks.map((link) => (
+              <li>
+                <a href={link.url} target="_blank" rel="noopener" class="hover:text-fg">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      <p>Shopify and Shopify POS are trademarks of Shopify Inc. {site.shortName} is an independent app.</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,63 @@
+---
+/**
+ * Link styled as a button. Variants:
+ * - primary: mint CTA (install)
+ * - secondary: outlined, adapts to light/dark
+ * - on-brand: outlined for use on the dark forest brand band
+ */
+import type { HTMLAttributes } from 'astro/types';
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props extends HTMLAttributes<'a'> {
+  href: string;
+  variant?: 'primary' | 'secondary' | 'on-brand';
+  size?: 'md' | 'lg';
+  icon?: IconName;
+  external?: boolean;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  external = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const variants = {
+  primary: 'bg-mint text-on-mint hover:bg-mint-strong shadow-[inset_0_-2px_0_rgb(0_0_0/0.12)]',
+  secondary: 'bg-surface text-fg ring-1 ring-line-strong hover:ring-fg/40',
+  'on-brand': 'text-on-brand ring-1 ring-white/25 hover:bg-white/10 hover:ring-white/40',
+};
+const sizes = {
+  md: 'h-10 px-4 text-sm',
+  lg: 'h-12 px-5 text-[0.9375rem]',
+};
+---
+
+<a
+  href={href}
+  class:list={[
+    'group inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-colors duration-150',
+    variants[variant],
+    sizes[size],
+    className,
+  ]}
+  {...external ? { target: '_blank', rel: 'noopener' } : {}}
+  {...rest}
+>
+  <slot />
+  {
+    icon && (
+      <Icon
+        name={icon}
+        size={size === 'lg' ? 18 : 16}
+        strokeWidth={2}
+        class="transition-transform duration-150 group-hover:translate-x-0.5"
+      />
+    )
+  }
+  {external && <span class="sr-only"> (opens in a new tab)</span>}
+</a>

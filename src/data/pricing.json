@@ -1,0 +1,101 @@
+{
+  "currency": "USD",
+  "yearlyBilling": false,
+  "notice": {
+    "enabled": true,
+    "label": "Early adopter",
+    "title": "You're benefiting from our early adopter policy",
+    "body": "EZ Order Printer is free for every store while we're in early access. Install now to get every feature at no cost, and you'll be the first to hear about new plans before anything changes."
+  },
+  "plans": [
+    {
+      "id": "free",
+      "name": "Free",
+      "tagline": "Every feature, for every Shopify store.",
+      "priceMonthly": 0,
+      "priceYearly": 0,
+      "priceNote": "Early access pricing",
+      "highlight": true,
+      "ctaLabel": "Install free on Shopify",
+      "features": [
+        "Invoice / receipt, packing slip, return, refund / credit note and draft order documents",
+        "14 ready-made templates with your logo, colours and legal details",
+        "Print, download as PDF and bulk print in one job",
+        "Email documents with the PDF attached, manually or automatically",
+        "Documents in 30+ languages and the currency your customer paid in",
+        "Print from the Shopify admin, Shopify POS and the customer's order page"
+      ]
+    }
+  ],
+  "comparison": [
+    {
+      "group": "Documents & templates",
+      "rows": [
+        { "feature": "Invoice / receipt", "values": ["yes"] },
+        { "feature": "Packing slip", "values": ["yes"] },
+        { "feature": "Return slip", "values": ["yes"] },
+        { "feature": "Refund / credit note", "values": ["yes"] },
+        { "feature": "Draft order (quote)", "values": ["yes"] },
+        { "feature": "Ready-made templates", "values": ["14"] },
+        { "feature": "Logo, colours, fonts and company details", "values": ["yes"] },
+        { "feature": "Tax, registration and bank details blocks", "values": ["yes"] }
+      ]
+    },
+    {
+      "group": "Print & PDF",
+      "rows": [
+        { "feature": "Print from the order page in Shopify admin", "values": ["yes"] },
+        { "feature": "Download as PDF", "values": ["yes"] },
+        { "feature": "Bulk print & download from the orders list", "values": ["yes"] },
+        { "feature": "Print and download in Shopify POS", "values": ["yes"] }
+      ]
+    },
+    {
+      "group": "Email",
+      "rows": [
+        { "feature": "Send documents by email with PDF attached", "values": ["yes"] },
+        { "feature": "Automatic emails on Shopify events", "values": ["yes"] },
+        { "feature": "Filter automations by order or customer tags", "values": ["yes"] },
+        { "feature": "Send from your own verified address", "values": ["yes"] }
+      ]
+    },
+    {
+      "group": "Global selling",
+      "rows": [
+        { "feature": "Document languages", "values": ["30+"] },
+        { "feature": "Multi-currency (presentment currency)", "values": ["yes"] },
+        { "feature": "Right-to-left layouts (Arabic, Hebrew)", "values": ["yes"] }
+      ]
+    },
+    {
+      "group": "Customers & support",
+      "rows": [
+        { "feature": "Invoice download button on the online store", "values": ["yes"] },
+        { "feature": "Email support", "values": ["yes"] },
+        { "feature": "Custom template built for you", "values": ["On request"] }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Is EZ Order Printer really free?",
+      "answer": "Yes. During early access every store gets the full app on the Free plan: all document types, templates, printing, PDF downloads and email automation. There is no credit card to enter."
+    },
+    {
+      "question": "How does billing work?",
+      "answer": "Every charge for a Shopify app goes through Shopify Billing and shows up on your regular Shopify invoice. We never ask for your card details. On the Free plan there is nothing to bill."
+    },
+    {
+      "question": "What happens when paid plans launch?",
+      "answer": "We will announce new plans in the app and by email before anything changes, and early adopters hear first. You will always approve any charge in Shopify yourself; nothing is upgraded without your confirmation."
+    },
+    {
+      "question": "Is there a free trial?",
+      "answer": "There is no trial to run out: the Free plan is the full product. If paid plans with a trial are added later, the trial terms will be shown on the Shopify approval screen."
+    },
+    {
+      "question": "Can I cancel or uninstall at any time?",
+      "answer": "Yes. Uninstall the app from your Shopify admin whenever you like. Your data is handled as described in our privacy policy, including Shopify's data-deletion requests."
+    }
+  ]
+}

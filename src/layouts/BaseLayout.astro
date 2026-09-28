@@ -1,0 +1,53 @@
+---
+/**
+ * Root layout: document shell, fonts, SEO tags, site-wide JSON-LD
+ * (Organization + WebSite) and the header/main/footer landmarks.
+ */
+import { Font } from 'astro:assets';
+import '../styles/global.css';
+import SEO, { type SeoProps } from '../components/seo/SEO.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import { organizationSchema, websiteSchema } from '../lib/json-ld-schema-builders';
+
+type Props = SeoProps;
+
+const props = Astro.props;
+const lang = Astro.currentLocale ?? 'en';
+// Right-to-left locales, ready for when more languages are added.
+const dir = ['ar', 'he', 'fa', 'ur'].includes(lang) ? 'rtl' : 'ltr';
+const jsonLd = [organizationSchema(), websiteSchema(), ...(props.jsonLd ?? [])];
+---
+
+<!doctype html>
+<html lang={lang} dir={dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#06120c" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="EZ Order Printer blog" href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <Font cssVariable="--font-inter" preload />
+    <Font cssVariable="--font-bricolage" preload />
+    <SEO {...props} jsonLd={jsonLd} />
+    <meta name="generator" content={Astro.generator} />
+    <slot name="head" />
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a
+      href="#main"
+      class="sr-only z-100 rounded-full bg-mint px-4 py-2 font-semibold text-on-mint focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      Skip to content
+    </a>
+    <Header />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

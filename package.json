@@ -1,0 +1,34 @@
+{
+  "name": "ezorder-website",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Marketing website for EZ Order Printer PDF Invoice (ezorder.io)",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && pagefind --site dist",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "allowScripts": {
+    "esbuild": true
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.0.2",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.5",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@tailwindcss/typography": "^0.5.20",
+    "pagefind": "^1.5.2",
+    "typescript": "^6.0.3"
+  }
+}

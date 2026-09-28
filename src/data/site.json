@@ -1,0 +1,19 @@
+{
+  "name": "EZ Order Printer PDF Invoice",
+  "shortName": "EZ Order Printer",
+  "tagline": "Branded invoices, packing slips and receipts for Shopify",
+  "description": "Create, print, download and email branded Shopify invoices, packing slips, refunds and draft-order quotes. Automated PDF emails, 30+ languages, any currency, Shopify POS.",
+  "url": "https://ezorder.io",
+  "appStoreUrl": "https://apps.shopify.com/ez-order-printer",
+  "appUrl": "https://app.ezorder.io",
+  "docsUrl": "https://docs.ezorder.io",
+  "privacyPolicyUrl": "https://app.ezorder.io/privacy-policy",
+  "supportEmail": "support@ezorder.io",
+  "companyName": "EZ Order",
+  "twitterHandle": "",
+  "social": [
+    { "label": "X (Twitter)", "url": "" },
+    { "label": "LinkedIn", "url": "" },
+    { "label": "YouTube", "url": "" }
+  ]
+}

@@ -1,0 +1,99 @@
+---
+/**
+ * Sticky site header. The mobile menu is a native <details> element, so it
+ * works without JavaScript; a tiny inline script only closes it on link
+ * click / Escape for convenience.
+ */
+import Logo from './Logo.astro';
+import Icon from '../ui/Icon.astro';
+import ButtonLink from '../ui/ButtonLink.astro';
+import { mainNav, site } from '../../data/site';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) =>
+  href !== '/' && !href.includes('#') && !href.startsWith('http') && path.startsWith(href);
+---
+
+<header class="sticky top-0 z-50 border-b border-line bg-bg/85 backdrop-blur-md">
+  <div class="container-page flex h-16 items-center justify-between gap-4">
+    <a href="/" class="-m-1 rounded-lg p-1" aria-label={`${site.shortName} home`}>
+      <Logo />
+    </a>
+
+    <nav aria-label="Main" class="hidden md:block">
+      <ul class="flex items-center gap-1 text-sm font-medium">
+        {
+          mainNav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="rounded-full px-3 py-2 text-muted transition-colors hover:text-fg aria-[current=page]:text-fg"
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+                {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <ButtonLink href={site.appStoreUrl} external class="hidden sm:inline-flex">
+        Install on Shopify
+      </ButtonLink>
+
+      <details class="group md:hidden" data-mobile-menu>
+        <summary
+          class="flex size-10 cursor-pointer list-none items-center justify-center rounded-full ring-1 ring-line-strong [&::-webkit-details-marker]:hidden"
+        >
+          <span class="sr-only">Toggle menu</span>
+          <Icon name="menu" class="group-open:hidden" />
+          <Icon name="x" class="hidden group-open:block" />
+        </summary>
+        <div
+          class="absolute inset-x-0 top-16 border-b border-line bg-bg px-4 pt-2 pb-6 shadow-paper"
+        >
+          <nav aria-label="Mobile">
+            <ul class="flex flex-col text-base font-medium">
+              {
+                mainNav.map((item) => (
+                  <li>
+                    <a
+                      href={item.href}
+                      class="block border-b border-line py-3.5"
+                      aria-current={isCurrent(item.href) ? 'page' : undefined}
+                      {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+          <ButtonLink href={site.appStoreUrl} external size="lg" class="mt-5 w-full">
+            Install on Shopify
+          </ButtonLink>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<script is:inline>
+  (() => {
+    const menu = document.querySelector('[data-mobile-menu]');
+    if (!menu) return;
+    menu.addEventListener('click', (e) => {
+      if (e.target instanceof Element && e.target.closest('a')) menu.removeAttribute('open');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.open) {
+        menu.removeAttribute('open');
+        menu.querySelector('summary')?.focus();
+      }
+    });
+  })();
+</script>

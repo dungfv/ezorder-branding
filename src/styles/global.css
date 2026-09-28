@@ -1,0 +1,167 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/*
+ * Design tokens.
+ * Raw values live in CSS variables so light/dark can swap them via
+ * `prefers-color-scheme`; `@theme inline` maps them to Tailwind utilities
+ * (`bg-surface`, `text-muted`, `border-line`, ...).
+ *
+ * Palette: "paper & ink" — warm paper background, forest-green brand
+ * (from the app logo, #022515) and a mint accent for calls to action.
+ * All text pairs are verified WCAG AA (see README → Design tokens).
+ */
+:root {
+  color-scheme: light dark;
+
+  --c-bg: #f8f7f3;
+  --c-surface: #ffffff;
+  --c-surface-muted: #efede6;
+  --c-fg: #0d1c15;
+  --c-muted: #4b5a52;
+  --c-line: #e2dfd5;
+  --c-line-strong: #cfcbbd;
+  --c-accent-text: #0a7442;
+
+  /* Brand band (hero, CTA) stays dark in both schemes */
+  --c-brand: #022515;
+  --c-brand-2: #063a23;
+  --c-on-brand: #ffffff;
+  --c-on-brand-muted: #a7c4b5;
+  --c-brand-line: rgb(255 255 255 / 0.12);
+
+  --c-mint: #2cd97f;
+  --c-mint-strong: #22c46f;
+  --c-on-mint: #022515;
+  --c-mint-soft: #d9f8e7;
+
+  --shadow-paper: 0 1px 2px rgb(13 28 21 / 0.06), 0 12px 32px -12px rgb(13 28 21 / 0.18);
+  --shadow-float: 0 2px 4px rgb(0 0 0 / 0.12), 0 32px 64px -24px rgb(0 0 0 / 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-bg: #06120c;
+    --c-surface: #0c1d15;
+    --c-surface-muted: #11261c;
+    --c-fg: #e9f1ec;
+    --c-muted: #a3b6ac;
+    --c-line: #1f3a2d;
+    --c-line-strong: #2c4d3d;
+    --c-accent-text: #5fe39c;
+
+    --c-brand: #0b2d1d;
+    --c-brand-2: #0f3a26;
+    --c-mint-soft: #123827;
+
+    --shadow-paper: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -12px rgb(0 0 0 / 0.6);
+  }
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-muted: var(--c-surface-muted);
+  --color-fg: var(--c-fg);
+  --color-muted: var(--c-muted);
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+  --color-accent: var(--c-accent-text);
+  --color-brand: var(--c-brand);
+  --color-brand-2: var(--c-brand-2);
+  --color-on-brand: var(--c-on-brand);
+  --color-on-brand-muted: var(--c-on-brand-muted);
+  --color-brand-line: var(--c-brand-line);
+  --color-mint: var(--c-mint);
+  --color-mint-strong: var(--c-mint-strong);
+  --color-on-mint: var(--c-on-mint);
+  --color-mint-soft: var(--c-mint-soft);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-inter), system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --shadow-paper: var(--shadow-paper);
+  --shadow-float: var(--shadow-float);
+}
+
+@theme {
+  --radius-card: 1.25rem;
+  --container-content: 72rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    @apply bg-bg text-fg font-sans antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display text-balance;
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--c-mint);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--c-mint);
+    color: var(--c-on-mint);
+  }
+}
+
+@layer components {
+  /* Page-width wrapper with the 16px mobile gutter the brief asks for. */
+  .container-page {
+    @apply mx-auto w-full max-w-(--container-content) px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Small receipt-style label that introduces a section: "01 · Documents". */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 font-mono text-xs font-medium tracking-[0.14em] text-accent uppercase;
+  }
+
+  /* Torn-receipt edge: a zig-zag mask on the bottom of a surface. */
+  .edge-torn {
+    --tooth: 14px;
+    mask:
+      conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / var(--tooth) 100%;
+  }
+
+  /* Dotted leader between a label and a value, like a printed receipt line. */
+  .leader {
+    @apply flex items-baseline gap-2;
+  }
+  .leader::after {
+    content: '';
+    order: 1;
+    flex: 1;
+    border-bottom: 1px dotted var(--c-line-strong);
+    transform: translateY(-0.3em);
+  }
+  .leader > :last-child {
+    order: 2;
+  }
+
+  /* Framed document screenshot: white paper on any background. */
+  .doc-frame {
+    @apply overflow-hidden rounded-xl bg-white ring-1 ring-black/5 shadow-paper;
+  }
+}
