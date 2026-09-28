@@ -175,7 +175,7 @@ aws cloudformation deploy --stack-name ezorder-website \
 
 ### 4. GitHub environment and variables
 
-The deploy job runs in the GitHub environment **`production`**, so the IAM role trusts the OIDC subject `repo:<owner>/<repo>:environment:production`.
+The deploy job runs in the GitHub environment **`production`**, so the IAM role trusts that environment's OIDC subject. GitHub now issues it with immutable IDs, `repo:<owner>@<owner_id>/<repo>@<repo_id>:environment:production` (this repo: `repo:dungfv@22865175/ezorder-branding@1392203605:environment:production`); older repositories may still get `repo:<owner>/<repo>:environment:production`. When unsure, print the claim once (see `docs/deploy-aws-console/06-iam-deploy-role.md`, section 6.6) and pass the repository part as `GitHubRepository`.
 
 1. Repository → Settings → **Environments** → New environment `production`.
 2. **Deployment branches and tags** → Selected branches → add `main`. This is what limits deploys to `main` (the role trusts the environment, not the branch).

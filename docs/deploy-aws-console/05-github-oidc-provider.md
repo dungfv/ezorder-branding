@@ -6,7 +6,8 @@ Thay vì lưu access key dài hạn trên GitHub, ta cấu hình AWS để **tin
 
 ```
 1. Job deploy chạy  → GitHub cấp cho job một token (JWT) đã ký, ghi rõ:
-                      "tôi là repo dungfv/ezorder-branding, environment production"
+                      "tôi là repo dungfv@22865175/ezorder-branding@1392203605,
+                       environment production"
 2. Action aws-actions/configure-aws-credentials gửi token + ARN role lên AWS STS
 3. AWS kiểm tra: chữ ký có đúng của GitHub không (nhờ Identity Provider ở bước này)
                  repo/nhánh có khớp trust policy của role không (bước 6)

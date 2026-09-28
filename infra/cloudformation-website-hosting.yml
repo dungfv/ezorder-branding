@@ -15,8 +15,12 @@ Parameters:
     Description: ACM certificate in us-east-1 covering the apex and www.
   GitHubRepository:
     Type: String
-    AllowedPattern: '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'
-    Description: owner/repo that is allowed to deploy (e.g. dungfv/ezorder-branding).
+    AllowedPattern: '^[A-Za-z0-9_.-]+(@[0-9]+)?/[A-Za-z0-9_.-]+(@[0-9]+)?$'
+    Description: >
+      Repository exactly as it appears in the OIDC "sub" claim. GitHub now issues
+      owner@<owner_id>/repo@<repo_id> for many repositories
+      (e.g. dungfv@22865175/ezorder-branding@1392203605); older ones use owner/repo.
+      Print the claim once (see docs/deploy-aws-console/06) if unsure.
   DeployEnvironment:
     Type: String
     Default: production

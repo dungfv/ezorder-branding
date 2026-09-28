@@ -47,7 +47,7 @@ Mở role → tab **Trust relationships** → **Edit trust policy**. Nội dung 
       "Condition": {
         "StringEquals": {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-          "token.actions.githubusercontent.com:sub": "repo:dungfv/ezorder-branding:environment:production"
+          "token.actions.githubusercontent.com:sub": "repo:dungfv@22865175/ezorder-branding@1392203605:environment:production"
         }
       }
     }
@@ -56,7 +56,9 @@ Mở role → tab **Trust relationships** → **Edit trust policy**. Nội dung 
 ```
 
 - `<ACCOUNT_ID>`: 12 số tài khoản AWS.
-- `repo:dungfv/ezorder-branding:environment:production`: đúng `owner/repo` ở bước 1 và đúng tên environment ở bước 7.1, **phân biệt hoa/thường**.
+- `sub` phải **giống hệt** giá trị GitHub gửi, phân biệt hoa thường. GitHub hiện dùng định dạng **có kèm ID**: `repo:<owner>@<owner_id>/<repo>@<repo_id>:environment:<environment>`. Với repo này là `repo:dungfv@22865175/ezorder-branding@1392203605:environment:production` (đã xác minh từ token thật ngày 28/09/2026). Repo tạo từ lâu có thể vẫn dùng định dạng cũ `repo:<owner>/<repo>:environment:<environment>`.
+- ID không đổi khi đổi tên repo, và repo tạo lại với tên cũ sẽ có ID khác, nên định dạng này an toàn hơn. Nếu **tạo repo mới** (hoặc xoá rồi tạo lại) thì `repo_id` đổi, phải cập nhật trust policy.
+- Không chắc `sub` là gì: xem mục 6.6.
 - Vì sao là `environment:production` chứ không phải `ref:refs/heads/main`: khi job có dòng `environment: production`, GitHub gửi `sub` theo environment. Giới hạn "chỉ nhánh `main`" được đặt ở phía GitHub (Deployment branches của environment, bước 7.1).
 - **Update policy**.
 
@@ -94,5 +96,25 @@ Lưu ý: dòng đầu là `arn:aws:s3:::<BUCKET>` (**không** có `/*`); dòng t
 ## 6.5 Lấy ARN của role
 
 Đầu trang role có **ARN** dạng `arn:aws:iam::<ACCOUNT_ID>:role/ezorder-website-github-deploy`. Copy vào bảng giá trị.
+
+## 6.6 Xem `sub` thật mà GitHub gửi
+
+Cách chắc chắn nhất khi `Not authorized to perform sts:AssumeRoleWithWebIdentity`: in claim của token ngay trong job deploy. Thêm bước này **trước** `aws-actions/configure-aws-credentials` (job phải có `id-token: write` và `environment: production`); bước này chỉ in phần nội dung đã giải mã, không in token:
+
+```yaml
+      - name: Debug OIDC claims (temporary)
+        run: |
+          curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" \
+          | node -e "
+              const { value } = JSON.parse(require('fs').readFileSync(0, 'utf8'));
+              const c = JSON.parse(Buffer.from(value.split('.')[1], 'base64url').toString());
+              console.log(JSON.stringify({ sub: c.sub, aud: c.aud, environment: c.environment }, null, 2));
+            "
+```
+
+Copy nguyên giá trị `sub` in ra rồi dán vào trust policy (6.3). Deploy chạy được thì gỡ bước này đi.
+
+Cách không cần sửa code: CloudTrail → Event history (region = `AWS_REGION`) → Event name `AssumeRoleWithWebIdentity` → sự kiện lỗi `AccessDenied` → trường `userIdentity.userName`. Sự kiện có thể trễ 5–15 phút.
 
 ➡️ Tiếp theo: [Bước 7 — Biến GitHub và deploy lần đầu](07-github-variables-first-deploy.md)
