@@ -1,6 +1,5 @@
 ---
-title: "EU VAT invoice requirements: Article 226 fields and the move to
-  e-invoicing XXX"
+title: "EU VAT invoice requirements: Article 226 fields and the move to e-invoicing"
 description: The mandatory VAT invoice fields under Article 226 of the EU VAT
   Directive, simplified invoices, and what e-invoicing, Peppol and ViDA mean for
   Shopify merchants.
