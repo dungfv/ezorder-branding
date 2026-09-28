@@ -54,7 +54,7 @@ src/
   data/                    site.json, pricing.json (CMS-editable), features, faq, testimonials…
   layouts/                 BaseLayout, BlogPostLayout, LegalLayout
   lib/                     blog helpers, JSON-LD builders, screenshot loader
-  pages/                   index, pricing, faq, about, privacy, terms, 404, blog/…, rss.xml
+  pages/                   index, pricing, faq, about, privacy-policy, terms, 404, blog/…, rss.xml
   styles/global.css        Tailwind + design tokens (light/dark)
 ```
 
@@ -300,7 +300,7 @@ Defined as CSS variables in `src/styles/global.css` and exposed to Tailwind (`bg
 - **POS copy** matches the POS extension: staff **print** invoice/receipt, packing slip, refund and return slip from the order screen. Download/email from POS is not claimed.
 - **Languages:** "29 languages" — the app ships 31 translation files, which are 29 distinct languages (Portuguese has pt, pt_BR, pt_PT). Older docs and the listing images say 12.
 - **"Made for Shopify"** strip instead of the "Built for Shopify" wording or badge, which may only be shown once the app earns it. No Shopify logos are used.
-- **Privacy page** covers the website and links to the app's canonical policy (`app.ezorder.io/privacy-policy`) instead of duplicating it.
+- **Privacy policy** (`/privacy-policy/`) mirrors the app's policy at `app.ezorder.io/privacy-policy`; keep the two in sync. The old `/privacy/` URL redirects there.
 - **Search UI** is a small custom component on Pagefind's JS API (matches the design, loads nothing until used) instead of Pagefind's default widget.
 - **Blog covers** were generated from the brand palette + real renders; replace them freely via the CMS.
 

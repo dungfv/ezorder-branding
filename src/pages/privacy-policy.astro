@@ -1,0 +1,458 @@
+---
+/**
+ * Privacy policy. Mirrors the app's policy (site.privacyPolicyUrl,
+ * app.ezorder.io/privacy-policy): keep the text and "last updated" date in
+ * sync with it whenever either one changes.
+ */
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { site } from '../data/site';
+
+const sections = [
+  { id: 'about', title: 'About this policy' },
+  { id: 'roles', title: 'Who controls what: merchant and app roles' },
+  { id: 'collect', title: 'Information we handle' },
+  { id: 'cookies', title: 'Cookies and similar technologies' },
+  { id: 'use', title: 'Why we handle it' },
+  { id: 'ai', title: 'Artificial intelligence and model training' },
+  { id: 'retention', title: 'How long we keep things' },
+  { id: 'sharing', title: 'Who else is involved' },
+  { id: 'transfers', title: 'International transfers' },
+  { id: 'security', title: 'How we protect it' },
+  { id: 'shopify-compliance', title: 'Shopify compliance webhooks' },
+  { id: 'rights', title: 'Your rights' },
+  { id: 'merchant-duties', title: 'If you are a merchant using the App' },
+  { id: 'children', title: "Children's privacy" },
+  { id: 'third-party-links', title: 'Third-party links' },
+  { id: 'changes', title: 'Changes to this policy' },
+  { id: 'contact', title: 'Contact us' },
+];
+
+const mailto = `mailto:${site.supportEmail}`;
+---
+
+<LegalLayout
+  title="Privacy Policy"
+  description="How EZ Order Printer — PDF Invoice handles merchant, store and buyer information."
+  lead="How EZ Order Printer — PDF Invoice handles merchant, store and buyer information."
+  lastUpdated="22 August 2026"
+>
+  <nav
+    aria-labelledby="toc-heading"
+    class="not-prose mb-12 rounded-xl border border-line bg-surface p-5 sm:p-6"
+  >
+    <h2 id="toc-heading" class="eyebrow">On this page</h2>
+    <ol class="mt-4 list-decimal space-y-1.5 pl-5 text-base marker:text-muted sm:columns-2 sm:gap-8">
+      {
+        sections.map((s) => (
+          <li class="break-inside-avoid">
+            <a href={`#${s.id}`} class="text-accent underline-offset-4 hover:underline">
+              {s.title}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+
+  <h2 id="about">1. About this policy</h2>
+  <p>
+    EZ Order Printer — PDF Invoice (“the App”, “we”, “us”) is a Shopify application that generates
+    invoices, packing slips, refund documents and draft-order quotes from a merchant’s existing store
+    data, and optionally delivers them by email.
+  </p>
+  <p>
+    This policy explains what information the App handles, why it handles it, how long it is kept and
+    what choices are available to the people it concerns. It applies to the App itself, to its theme
+    and admin extensions, and to <code>ezorder.io</code>.
+  </p>
+  <p>
+    It does <em>not</em> apply to Shopify’s own processing of store data, nor to any other app installed
+    on the same store. Those are governed by their own policies.
+  </p>
+
+  <h2 id="roles">2. Who controls what: merchant and app roles</h2>
+  <p>Two different relationships run in parallel, and it matters which one you are in.</p>
+  <ul>
+    <li>
+      <strong>Merchant account data.</strong> For information about the merchant and their store —
+      contact address, plan, settings — we act as the <strong>data controller</strong>. We decide why it
+      is held and for how long.
+    </li>
+    <li>
+      <strong>Store and buyer data.</strong> For order, customer and product records belonging to a
+      merchant’s Shopify store, the merchant is the controller and we act as
+      their <strong>data processor</strong>. We only process that data on the merchant’s instructions, for the
+      purpose of producing and delivering the documents they asked for.
+    </li>
+  </ul>
+  <p>
+    If you are a shopper and want a copy of, or the deletion of, data held about you, contact the store
+    you purchased from. They can raise the request with us, and Shopify’s compliance webhooks
+    (see <a href="#shopify-compliance">Shopify compliance webhooks</a>) forward it to us automatically.
+  </p>
+
+  <h2 id="collect">3. Information we handle</h2>
+  <h3>Merchant and store account data</h3>
+  <p>
+    When the App is installed, Shopify’s OAuth flow gives us the store’s myshopify domain and an access
+    token. From the Shopify Admin API we then read the store profile we need to configure the App
+    sensibly: store name, primary and custom domains, contact email address and phone number, billing
+    country and address, currency, weight unit, timezone, enabled locales and the store’s Shopify plan.
+  </p>
+
+  <h3>Store data accessed to build documents</h3>
+  <p>
+    The App requests only the Admin API scopes it needs to render a document. Under those scopes it can
+    read orders and their line items, transactions, refunds and returns; draft orders and payment terms;
+    customer names, email addresses, phone numbers and billing/shipping addresses; product and variant
+    details; fulfillment and location data; store locales and markets; and theme files, so the
+    storefront download button can be installed and removed.
+  </p>
+  <blockquote>
+    <p>
+      <strong>Order data is read on demand, not warehoused.</strong> When a document is generated the App
+      fetches the current record from Shopify, renders it, and returns the file. We do not maintain a
+      parallel copy of a store’s order book or customer list.
+    </p>
+  </blockquote>
+
+  <h3>App configuration you create</h3>
+  <p>
+    Templates, layouts, translated strings, numbering and formatting preferences, email automation rules
+    and email templates, and any files you upload for use in documents — logos, signatures, stamps,
+    background images. Uploaded files are stored in our object storage
+    (see <a href="#sharing">Who else is involved</a>).
+  </p>
+
+  <h3>Email delivery data</h3>
+  <p>
+    If you send documents by email, we store the sender address or sender domain you asked us to verify,
+    together with its verification status from our email provider, and the DNS records you need to
+    publish. We also write a short-lived delivery log entry — store, order identifier, document type and
+    trigger — used solely to stop a retried webhook from sending the same invoice twice. Those entries
+    delete themselves automatically 24 hours after they are written.
+  </p>
+
+  <h3>Storefront download requests</h3>
+  <p>
+    If a merchant enables the customer-facing download button, a shopper may be asked to enter the email
+    address on the order before a document is released. That address is checked against the order and
+    used to authorise the download; it is a verification step, not a mailing-list signup.
+  </p>
+
+  <h3>Technical and diagnostic data</h3>
+  <p>
+    Our servers record ordinary request metadata: IP address, user agent, requested path, response
+    status, timestamps and, when something fails, an error trace. This is what lets us find a broken
+    render, block abuse and keep rate limits honest.
+  </p>
+
+  <h2 id="cookies">4. Cookies and similar technologies</h2>
+  <p>
+    The embedded admin interface authenticates with short-lived Shopify session tokens, not cookies. That
+    is deliberate: it works in browsers that block third-party cookies, and it means no tracking cookie is
+    set on you while you use the App inside the Shopify admin.
+  </p>
+  <p>
+    Your browser’s own local storage may hold interface preferences — the last table filter you used, for
+    example. That data never leaves your device.
+  </p>
+  <p>
+    We do not run advertising pixels, cross-site trackers or third-party analytics beacons in the
+    embedded app or in the storefront extension.
+  </p>
+
+  <h2 id="use">5. Why we handle it</h2>
+  <div class="overflow-x-auto">
+    <table>
+      <thead>
+        <tr><th>Purpose</th><th>What it involves</th><th>Legal basis (UK/EU GDPR)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Providing the App</td>
+          <td>Rendering documents, applying templates, delivering email, running the storefront button</td>
+          <td>Performance of a contract</td>
+        </tr>
+        <tr>
+          <td>Account administration</td>
+          <td>Plan level, usage counts against plan limits, billing state via Shopify</td>
+          <td>Performance of a contract</td>
+        </tr>
+        <tr>
+          <td>Support</td>
+          <td>Answering your messages and reproducing reported problems</td>
+          <td>Legitimate interests</td>
+        </tr>
+        <tr>
+          <td>Security and abuse prevention</td>
+          <td>Rate limiting, request logs, webhook signature verification</td>
+          <td>Legitimate interests</td>
+        </tr>
+        <tr>
+          <td>Service improvement</td>
+          <td>Aggregate, non-identifying feature and error statistics</td>
+          <td>Legitimate interests</td>
+        </tr>
+        <tr>
+          <td>Product announcements</td>
+          <td>Occasional email about the App to the merchant contact address</td>
+          <td>Legitimate interests, with opt-out in every message</td>
+        </tr>
+        <tr>
+          <td>Legal obligations</td>
+          <td>Responding to lawful requests and to Shopify’s compliance webhooks</td>
+          <td>Legal obligation</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    We do not use store data for automated decision-making that produces legal or similarly significant
+    effects.
+  </p>
+
+  <h2 id="ai">6. Artificial intelligence and model training</h2>
+  <p>
+    We do not use merchant data, order data or buyer personal data to train general-purpose AI or
+    machine-learning models, and we do not make such data available to any third party for that purpose.
+  </p>
+  <p>
+    Where a feature is assisted by a model — for example, drafting suggested wording for a template — the
+    request is scoped to what that feature needs, is not retained for training by us, and is
+    contractually excluded from training by the provider.
+  </p>
+
+  <h2 id="retention">7. How long we keep things</h2>
+  <div class="overflow-x-auto">
+    <table>
+      <thead>
+        <tr><th>Data</th><th>Retention</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Generated PDF and image documents</td>
+          <td>Produced on request and streamed to you; transient working copies are cleared automatically</td>
+        </tr>
+        <tr><td>Order, customer and product records</td><td>Not stored — read from Shopify at render time</td></tr>
+        <tr><td>Email send log (deduplication)</td><td>Deletes itself 24 hours after the send</td></tr>
+        <tr>
+          <td>Uploaded template assets</td>
+          <td>Until you delete them in the App, or until you ask us to remove them</td>
+        </tr>
+        <tr>
+          <td>Templates and app settings</td>
+          <td>Kept after uninstall so that reinstalling restores your setup; deleted on request</td>
+        </tr>
+        <tr><td>Shopify access token and session</td><td>Revoked and cleared immediately on uninstall</td></tr>
+        <tr>
+          <td>Verified sender addresses and domains</td>
+          <td>Until you remove them in the App, or until you ask us to remove them</td>
+        </tr>
+        <tr><td>Server and error logs</td><td>Up to 30 days</td></tr>
+        <tr><td>Billing and tax records</td><td>As required by law, typically up to 7 years</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    When you uninstall the App, Shopify notifies us immediately. We revoke the access token on receipt,
+    which ends all further access to your store, and we deactivate the account and cancel any
+    subscription. Your templates and settings are deliberately kept beyond that point, because merchants
+    routinely reinstall and expect their configuration to still be there. To have them erased instead,
+    email us and we will delete them.
+  </p>
+
+  <h2 id="sharing">8. Who else is involved</h2>
+  <p>
+    <strong>
+      We do not sell personal information, and we do not share it for cross-context behavioural
+      advertising.
+    </strong>
+  </p>
+  <p>
+    We rely on a small set of vetted service providers, each bound by a data processing agreement and
+    each given only the data its function requires:
+  </p>
+  <div class="overflow-x-auto">
+    <table>
+      <thead>
+        <tr><th>Provider</th><th>Function</th><th>Region</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Shopify Inc.</td>
+          <td>Platform, authentication, billing, store data source</td>
+          <td>Global</td>
+        </tr>
+        <tr>
+          <td>Amazon Web Services</td>
+          <td>Application hosting, object storage for uploaded assets, transactional email delivery</td>
+          <td>United States</td>
+        </tr>
+        <tr>
+          <td>Managed database and cache hosting</td>
+          <td>Settings, templates and job queues</td>
+          <td>United States</td>
+        </tr>
+        <tr>
+          <td>Slack Technologies</td>
+          <td>Internal operational alerting (no buyer personal data)</td>
+          <td>United States</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    We may also disclose information where the law requires it, to establish or defend legal claims, or
+    to protect the rights and safety of our users. If our business is merged, acquired or otherwise
+    transferred, information may pass to the successor entity under this same policy; you will be told
+    before that happens.
+  </p>
+  <p>
+    <strong>Payments.</strong> Subscriptions are handled by the Shopify Billing API and charged to your
+    Shopify invoice. We never receive, process or store your card details.
+  </p>
+
+  <h2 id="transfers">9. International transfers</h2>
+  <p>
+    Our infrastructure is operated in the United States. If you are in the United Kingdom, the European
+    Economic Area or another region with transfer restrictions, your data will be transferred outside
+    that region.
+  </p>
+  <p>
+    Those transfers are covered by the European Commission’s Standard Contractual Clauses and the UK
+    International Data Transfer Addendum, together with technical measures — encryption in transit and
+    at rest, and access limited to named personnel — appropriate to the data involved.
+  </p>
+
+  <h2 id="security">10. How we protect it</h2>
+  <ul>
+    <li>All traffic to and from the App is encrypted with TLS; plain HTTP is redirected.</li>
+    <li>
+      Admin requests are authenticated with short-lived, signed Shopify session tokens, verified on every
+      request. Shopify webhooks are rejected unless their HMAC signature validates.
+    </li>
+    <li>
+      Stored data is encrypted at rest, and access tokens are held separately from application settings.
+    </li>
+    <li>
+      Access to production systems is restricted to the engineers who need it, on the principle of least
+      privilege, and is logged.
+    </li>
+    <li>Rate limiting and abuse controls protect the public download endpoints.</li>
+    <li>Dependencies are monitored for known vulnerabilities and patched on a regular cadence.</li>
+  </ul>
+  <p>
+    No system is perfectly secure. If we become aware of a breach affecting personal data we will notify
+    affected merchants and the relevant supervisory authority without undue delay, and within 72 hours
+    where the law requires it.
+  </p>
+
+  <h2 id="shopify-compliance">11. Shopify compliance webhooks</h2>
+  <p>
+    Shopify requires every app to answer three mandatory privacy webhooks. The App implements all three,
+    and verifies the signature on each before acting:
+  </p>
+  <ul>
+    <li>
+      <code>customers/data_request</code> — a shopper has asked a merchant for the data an app holds about
+      them. We report back what is held for that store so the merchant can pass it on.
+    </li>
+    <li>
+      <code>customers/redact</code> — a shopper has asked for erasure. Because the App reads order and
+      customer records from Shopify at the moment a document is rendered and does not keep a copy, there
+      is normally no buyer record on our side to erase; anything found is removed.
+    </li>
+    <li>
+      <code>shop/redact</code> — sent 48 hours after a store is closed or the App is uninstalled. We clear
+      the store’s session and revoke its access token, ending all access. Remaining app settings follow
+      the retention schedule above.
+    </li>
+  </ul>
+
+  <h2 id="rights">12. Your rights</h2>
+  <h3>United Kingdom and European Economic Area</h3>
+  <p>
+    You may request access to your personal data; correction of inaccurate data; erasure; restriction of
+    processing; portability in a machine-readable format; and you may object to processing based on
+    legitimate interests. Where processing rests on consent, you may withdraw it at any time without
+    affecting what was done beforehand. You also have the right to complain to your local supervisory
+    authority.
+  </p>
+
+  <h3>California</h3>
+  <p>
+    You may request to know the categories and specific pieces of personal information collected, the
+    sources, and the purposes; request deletion; request correction; and opt out of sale or sharing —
+    although, as stated above, we do neither. We will not discriminate against you for exercising any of
+    these rights.
+  </p>
+
+  <h3>Other regions</h3>
+  <p>
+    If your local law grants equivalent rights — for example under Brazil’s LGPD, Canada’s PIPEDA, or
+    Australia’s Privacy Act — we will honour them on the same terms.
+  </p>
+
+  <p>
+    To exercise any right, email <a href={mailto}>{site.supportEmail}</a> from the address associated
+    with your store. We respond within 30 days and may need to verify your identity first. Shoppers
+    should contact the merchant they bought from, whose request reaches us through the webhooks
+    described in <a href="#shopify-compliance">Shopify compliance webhooks</a>.
+  </p>
+
+  <h2 id="merchant-duties">13. If you are a merchant using the App</h2>
+  <p>Because you are the controller of your store’s data, a few responsibilities stay with you:</p>
+  <ul>
+    <li>
+      Make sure your own privacy notice tells your customers that invoices and related documents are
+      generated and, if you enable it, emailed by a third-party service.
+    </li>
+    <li>
+      Only put information in a template that you are entitled to include in a document sent to that
+      customer.
+    </li>
+    <li>
+      Verify a sender address or domain you are entitled to send from, and keep its DNS records current.
+    </li>
+    <li>
+      Forward any shopper privacy request to us promptly if Shopify’s webhook has not already done so.
+    </li>
+  </ul>
+
+  <h2 id="children">14. Children’s privacy</h2>
+  <p>
+    The App is a business tool for merchants and is not directed at children. We do not knowingly
+    collect personal information from anyone under 16. If we learn that we hold such information without
+    an appropriate basis, we will delete it. If you believe a child’s data has reached us, write
+    to <a href={mailto}>{site.supportEmail}</a> and we will act on it.
+  </p>
+
+  <h2 id="third-party-links">15. Third-party links</h2>
+  <p>
+    Documents and interfaces produced by the App may contain links you or a merchant configured — a
+    storefront, a support page, a social profile. Following such a link takes you to a site we do not
+    operate and whose privacy practices are its own. Read its policy before providing information there.
+  </p>
+
+  <h2 id="changes">16. Changes to this policy</h2>
+  <p>
+    We update this policy when the App changes or the law does. The date at the top always reflects the
+    current version.
+  </p>
+  <p>
+    Minor clarifications take effect when published. For changes that materially affect how personal
+    data is handled, we will notify merchants by email or through the App at least 14 days before they
+    take effect, so there is time to review them or to uninstall.
+  </p>
+
+  <h2 id="contact">17. Contact us</h2>
+  <p>
+    Questions about this policy, or about the data we hold, go
+    to <a href={mailto}>{site.supportEmail}</a>. We aim to reply within two business days.
+  </p>
+  <p>
+    If you are in the EEA or the UK and are not satisfied with our response, you may lodge a complaint
+    with your national data protection authority.
+  </p>
+</LegalLayout>

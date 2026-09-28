@@ -7,11 +7,13 @@ import { breadcrumbSchema } from '../lib/json-ld-schema-builders';
 interface Props {
   title: string;
   description: string;
+  /** Optional intro line under the page title. */
+  lead?: string;
   lastUpdated: string;
   noindex?: boolean;
 }
 
-const { title, description, lastUpdated, noindex = false } = Astro.props;
+const { title, description, lead, lastUpdated, noindex = false } = Astro.props;
 ---
 
 <BaseLayout
@@ -20,11 +22,13 @@ const { title, description, lastUpdated, noindex = false } = Astro.props;
   noindex={noindex}
   jsonLd={[breadcrumbSchema([{ name: 'Home', path: '/' }, { name: title, path: Astro.url.pathname }])]}
 >
-  <PageHeader eyebrow="Legal" title={title} align="left">
+  <PageHeader eyebrow="Legal" title={title} lead={lead} align="left">
     <p class="mt-4 font-mono text-xs tracking-wider text-muted uppercase">Last updated: {lastUpdated}</p>
   </PageHeader>
   <div class="container-page mt-8">
-    <article class="prose prose-lg max-w-3xl prose-headings:font-display">
+    <article
+      class="prose prose-lg max-w-3xl prose-headings:font-display prose-code:rounded prose-code:bg-surface-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:font-normal prose-code:before:content-none prose-code:after:content-none"
+    >
       <slot />
     </article>
   </div>

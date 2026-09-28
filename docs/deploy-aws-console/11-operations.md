@@ -24,7 +24,7 @@ Ví dụ khi thêm Formspree hoặc một công cụ analytics:
 2. Sửa **Content-Security-Policy**, ví dụ thêm domain của dịch vụ vào `script-src`, `connect-src` hay `form-action`.
 3. **Save changes**. Có hiệu lực sau vài phút, **không cần deploy lại code**.
 4. Nhớ sửa cùng chuỗi trong `infra/cloudformation-website-hosting.yml` để hai nơi khớp nhau.
-5. Nếu thêm analytics: cập nhật trang `/privacy` (hiện ghi "no analytics").
+5. Nếu thêm analytics: cập nhật trang `/privacy-policy` (mục 4 hiện ghi không dùng analytics).
 
 ## Dọn file cũ trong bucket
 

@@ -14,6 +14,11 @@ export default defineConfig({
   // (and 301s `/about` there), so every URL ends with a slash.
   trailingSlash: 'always',
 
+  // Moved pages: keep old URLs working.
+  redirects: {
+    '/privacy': '/privacy-policy/',
+  },
+
   // English only for now; routing is ready for more locales (no prefix for the default one).
   i18n: {
     defaultLocale: 'en',
