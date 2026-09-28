@@ -23,7 +23,8 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
-      filter: (page) => !page.endsWith('/404/'),
+      // Keep noindex pages out: 404 and the draft terms (remove '/terms/' once final).
+      filter: (page) => !page.endsWith('/404/') && !page.endsWith('/terms/'),
       i18n: { defaultLocale: 'en', locales: { en: 'en' } },
     }),
   ],

@@ -11,6 +11,7 @@ export type JsonLd = Record<string, unknown>;
 
 const ORG_ID = `${site.url}/#organization`;
 const WEBSITE_ID = `${site.url}/#website`;
+const APP_ID = `${site.url}/#app`;
 
 /** Absolute URL for a site-relative path. */
 export function absoluteUrl(path: string): string {
@@ -53,6 +54,7 @@ export function softwareApplicationSchema(plans: PricingPlan[], currency: string
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
+    '@id': APP_ID,
     name: site.name,
     applicationCategory: 'BusinessApplication',
     applicationSubCategory: 'Invoicing',
@@ -75,27 +77,6 @@ export function offerSchema(plan: PricingPlan, currency: string): JsonLd {
     url: site.appStoreUrl,
     availability: 'https://schema.org/InStock',
     category: plan.priceMonthly === 0 ? 'free' : 'subscription',
-  };
-}
-
-/** Pricing page: the app as a Product with one Offer per plan. */
-export function pricingOffersSchema(plans: PricingPlan[], currency: string): JsonLd {
-  const prices = plans.map((p) => p.priceMonthly);
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: site.name,
-    description: site.description,
-    brand: { '@type': 'Brand', name: site.companyName },
-    image: absoluteUrl('/og-default.jpg'),
-    offers: {
-      '@type': 'AggregateOffer',
-      priceCurrency: currency,
-      lowPrice: Math.min(...prices).toFixed(2),
-      highPrice: Math.max(...prices).toFixed(2),
-      offerCount: plans.length,
-      offers: plans.map((plan) => offerSchema(plan, currency)),
-    },
   };
 }
 
@@ -144,7 +125,8 @@ export function blogPostingSchema(post: {
     image: absoluteUrl(post.image),
     datePublished: post.pubDate.toISOString(),
     dateModified: (post.updatedDate ?? post.pubDate).toISOString(),
-    author: { '@type': 'Person', name: post.author },
+    // "EZ Order team"-style bylines are an organisation, not a person.
+    author: { '@type': /\bteam\b/i.test(post.author) ? 'Organization' : 'Person', name: post.author },
     publisher: { '@id': ORG_ID },
     keywords: post.tags.join(', '),
     inLanguage: 'en',

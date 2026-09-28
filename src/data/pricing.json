@@ -22,7 +22,7 @@
         "14 ready-made templates with your logo, colours and legal details",
         "Print, download as PDF and bulk print in one job",
         "Email documents with the PDF attached, manually or automatically",
-        "Documents in 30+ languages and the currency your customer paid in",
+        "Documents in 29 languages and the currency your customer paid in",
         "Print from the Shopify admin and Shopify POS; customers download from their order page"
       ]
     }
@@ -62,7 +62,7 @@
     {
       "group": "Global selling",
       "rows": [
-        { "feature": "Document languages", "values": ["30+"] },
+        { "feature": "Document languages", "values": ["29"] },
         { "feature": "Multi-currency (presentment currency)", "values": ["yes"] },
         { "feature": "Right-to-left layouts (Arabic, Hebrew)", "values": ["yes"] }
       ]

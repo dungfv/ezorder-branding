@@ -31,7 +31,7 @@ export const homeFaq: FaqItem[] = [
   {
     question: 'Which languages and currencies are supported?',
     answer:
-      'Documents can be printed in more than 30 languages, including right-to-left languages such as Arabic and Hebrew, and in the currency the customer paid in, with the right symbol and number format.',
+      'Documents can be printed in 29 languages, including right-to-left languages such as Arabic and Hebrew, and in the currency the customer paid in, with the right symbol and number format.',
   },
   {
     question: 'Can customers download invoices themselves?',

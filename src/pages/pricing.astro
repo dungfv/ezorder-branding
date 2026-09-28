@@ -8,13 +8,13 @@ import PricingPlans from '../components/pricing/PricingPlans.astro';
 import PlanComparisonTable from '../components/pricing/PlanComparisonTable.astro';
 import FinalCtaBand from '../components/home/FinalCtaBand.astro';
 import { pricing } from '../data/pricing';
-import { breadcrumbSchema, faqPageSchema, pricingOffersSchema } from '../lib/json-ld-schema-builders';
+import { breadcrumbSchema, faqPageSchema, softwareApplicationSchema } from '../lib/json-ld-schema-builders';
 
 const { notice, plans, faq, currency } = pricing;
 const isSingle = plans.length === 1;
 
 const jsonLd = [
-  pricingOffersSchema(plans, currency),
+  softwareApplicationSchema(plans, currency),
   faqPageSchema(faq),
   breadcrumbSchema([
     { name: 'Home', path: '/' },

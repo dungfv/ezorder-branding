@@ -1,34 +1,45 @@
 /**
- * Typed access to site-wide settings.
- * The values live in `site.json` so non-developers can edit them in Pages CMS.
+ * Site-wide settings.
+ * Values live in `site.json` so non-developers can edit them in Pages CMS; they
+ * are validated with zod at build time so a bad CMS edit fails with a clear message.
+ * The canonical origin comes from `site` in astro.config.mjs (single source of truth).
  */
+import { z } from 'astro/zod';
 import siteJson from './site.json';
 
-export interface SocialLink {
-  label: string;
-  url: string;
-}
+/** Empty strings / nulls from the CMS become "not set". */
+const optionalText = z.preprocess((v) => (v == null ? '' : v), z.string().trim());
+const optionalUrl = optionalText.refine((v) => v === '' || /^(https?:\/\/|mailto:)/.test(v), {
+  message: 'must be empty or start with https://',
+});
 
-export interface SiteSettings {
-  name: string;
-  shortName: string;
-  tagline: string;
-  description: string;
-  url: string;
-  appStoreUrl: string;
-  appUrl: string;
-  docsUrl: string;
-  privacyPolicyUrl: string;
-  supportEmail: string;
-  companyName: string;
-  twitterHandle: string;
-  social: SocialLink[];
-}
+const SiteSchema = z.object({
+  name: z.string().min(1),
+  shortName: z.string().min(1),
+  tagline: z.string().min(1),
+  description: z.string().min(1),
+  appStoreUrl: z.url(),
+  appUrl: optionalUrl,
+  /** Empty = no docs site yet: Docs links are hidden everywhere. */
+  docsUrl: optionalUrl,
+  privacyPolicyUrl: z.url(),
+  supportEmail: z.email(),
+  companyName: z.string().min(1),
+  twitterHandle: optionalText,
+  social: z
+    .preprocess((v) => v ?? [], z.array(z.object({ label: optionalText, url: optionalUrl })))
+    .default([]),
+});
 
-export const site: SiteSettings = siteJson;
+export type SiteSettings = z.infer<typeof SiteSchema> & { url: string };
+
+export const site: SiteSettings = {
+  ...SiteSchema.parse(siteJson),
+  url: (import.meta.env.SITE ?? 'https://ezorder.io').replace(/\/$/, ''),
+};
 
 /** Social profiles with an actual URL (empty entries are hidden). */
-export const socialLinks = site.social.filter((link) => link.url.trim() !== '');
+export const socialLinks = site.social.filter((link) => link.url !== '');
 
 export interface NavItem {
   label: string;
@@ -36,11 +47,13 @@ export interface NavItem {
   external?: boolean;
 }
 
+const docsLink: NavItem[] = site.docsUrl ? [{ label: 'Docs', href: site.docsUrl, external: true }] : [];
+
 export const mainNav: NavItem[] = [
   { label: 'Features', href: '/#features' },
   { label: 'Pricing', href: '/pricing/' },
   { label: 'Blog', href: '/blog/' },
-  { label: 'Docs', href: site.docsUrl, external: true },
+  ...docsLink,
   { label: 'About', href: '/about/' },
 ];
 
@@ -58,7 +71,8 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
     title: 'Resources',
     items: [
       { label: 'Blog', href: '/blog/' },
-      { label: 'Documentation', href: site.docsUrl, external: true },
+      { label: 'FAQ', href: '/faq/' },
+      ...(site.docsUrl ? [{ label: 'Documentation', href: site.docsUrl, external: true }] : []),
       { label: 'Shopify App Store', href: site.appStoreUrl, external: true },
       { label: 'RSS feed', href: '/rss.xml' },
     ],
@@ -72,3 +86,6 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
     ],
   },
 ];
+
+/** Attributes for links that open in a new tab. */
+export const externalLinkAttrs = { target: '_blank', rel: 'noopener' } as const;

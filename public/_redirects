@@ -1,5 +1,0 @@
-# Cloudflare Pages redirects — https://developers.cloudflare.com/pages/configuration/redirects/
-# The app's email-verification page links to https://ezorder.io/faq/ (docs used to live here).
-# TODO: confirm the docs domain and FAQ path, then adjust.
-/faq/ https://docs.ezorder.io/faq/ 301
-/faq https://docs.ezorder.io/faq/ 301

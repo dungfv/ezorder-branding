@@ -1,0 +1,48 @@
+---
+/**
+ * All FAQs on one page. The app's email-verification screen links to
+ * https://ezorder.io/faq/, so this URL must keep working.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import FaqList from '../components/ui/FaqList.astro';
+import FinalCtaBand from '../components/home/FinalCtaBand.astro';
+import { homeFaq } from '../data/faq';
+import { pricing } from '../data/pricing';
+import { site } from '../data/site';
+import { breadcrumbSchema, faqPageSchema } from '../lib/json-ld-schema-builders';
+
+const groups = [
+  { id: 'product', title: 'Product', items: homeFaq },
+  { id: 'billing', title: 'Pricing & billing', items: pricing.faq },
+];
+---
+
+<BaseLayout
+  title="FAQ"
+  description="Answers about EZ Order Printer: documents, templates, Shopify POS, email automation, languages, pricing and billing."
+  jsonLd={[
+    faqPageSchema(groups.flatMap((group) => group.items)),
+    breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'FAQ', path: '/faq/' }]),
+  ]}
+>
+  <PageHeader
+    eyebrow="Help"
+    title="Frequently asked questions"
+    lead={`Everything merchants ask before and after installing. Still stuck? Email ${site.supportEmail}.`}
+  />
+
+  <div class="container-page mt-16 space-y-20">
+    {
+      groups.map((group) => (
+        <section aria-labelledby={`faq-${group.id}`} class="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+          <SectionHeading id={`faq-${group.id}`} title={group.title} />
+          <FaqList items={group.items} />
+        </section>
+      ))
+    }
+  </div>
+
+  <FinalCtaBand />
+</BaseLayout>

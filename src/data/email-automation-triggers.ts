@@ -12,7 +12,7 @@ export const emailTriggerGroups: { document: string; triggers: string[] }[] = [
       'Order partially fulfilled',
       'Order refunded',
       'Order cancelled',
-      'Order edited',
+      'Order updated',
     ],
   },
   {

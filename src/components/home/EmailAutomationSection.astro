@@ -73,21 +73,22 @@ const rule = [
 
       <div class="mt-6">
         <p class="text-sm font-semibold">Available triggers</p>
-        <ul class="mt-3 flex flex-wrap gap-2">
+        <dl class="mt-3 space-y-3">
           {
-            emailTriggerGroups.flatMap((group) =>
-              group.triggers.map((trigger) => (
-                <li
-                  class="rounded-full border border-line bg-surface px-3 py-1 text-xs text-muted"
-                  title={group.document}
-                >
-                  {trigger}
-                </li>
-              )),
-            )
+            emailTriggerGroups.map((group) => (
+              <div class="flex flex-col gap-1.5 sm:flex-row sm:items-baseline sm:gap-3">
+                <dt class="shrink-0 text-xs font-medium text-muted sm:w-32">{group.document}</dt>
+                <dd>
+                  <ul class="flex flex-wrap gap-1.5">
+                    {group.triggers.map((trigger) => (
+                      <li class="rounded-full border border-line bg-surface px-2.5 py-0.5 text-xs">{trigger}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            ))
           }
-          <li class="rounded-full px-3 py-1 text-xs font-medium text-accent">and more</li>
-        </ul>
+        </dl>
       </div>
     </div>
   </div>

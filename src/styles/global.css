@@ -22,6 +22,8 @@
   --c-line: #e2dfd5;
   --c-line-strong: #cfcbbd;
   --c-accent-text: #0a7442;
+  /* Focus ring: ≥3:1 against every surface it appears on */
+  --c-focus: #0a7442;
 
   /* Brand band (hero, CTA) stays dark in both schemes */
   --c-brand: #022515;
@@ -49,6 +51,7 @@
     --c-line: #1f3a2d;
     --c-line-strong: #2c4d3d;
     --c-accent-text: #5fe39c;
+    --c-focus: #2cd97f;
 
     --c-brand: #0b2d1d;
     --c-brand-2: #0f3a26;
@@ -116,9 +119,14 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--c-mint);
+    outline: 2px solid var(--c-focus);
     outline-offset: 3px;
     border-radius: 4px;
+  }
+
+  /* On the dark brand bands the focus ring switches to mint for contrast. */
+  .bg-brand :focus-visible {
+    outline-color: var(--c-mint);
   }
 
   ::selection {

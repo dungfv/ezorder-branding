@@ -53,10 +53,18 @@ const alternates = LOCALES.map((locale) => ({
 
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={canonical} />
 {noindex && <meta name="robots" content="noindex, follow" />}
-{alternates.map((alt) => <link rel="alternate" hreflang={alt.locale} href={alt.url} />)}
-<link rel="alternate" hreflang="x-default" href={canonical} />
+{
+  !noindex && (
+    <>
+      <link rel="canonical" href={canonical} />
+      {alternates.map((alt) => (
+        <link rel="alternate" hreflang={alt.locale} href={alt.url} />
+      ))}
+      <link rel="alternate" hreflang="x-default" href={canonical} />
+    </>
+  )
+}
 
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={site.name} />
@@ -77,4 +85,9 @@ const alternates = LOCALES.map((locale) => ({
 <meta name="twitter:image:alt" content={imageAlt} />
 {site.twitterHandle && <meta name="twitter:site" content={site.twitterHandle} />}
 
-{jsonLd.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+{
+  // Escape "<" so CMS-provided text can never close the <script> element.
+  jsonLd.map((data) => (
+    <script type="application/ld+json" set:html={JSON.stringify(data).replace(/</g, '\\u003c')} />
+  ))
+}

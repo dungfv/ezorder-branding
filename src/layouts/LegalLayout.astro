@@ -8,14 +8,16 @@ interface Props {
   title: string;
   description: string;
   lastUpdated: string;
+  noindex?: boolean;
 }
 
-const { title, description, lastUpdated } = Astro.props;
+const { title, description, lastUpdated, noindex = false } = Astro.props;
 ---
 
 <BaseLayout
   title={title}
   description={description}
+  noindex={noindex}
   jsonLd={[breadcrumbSchema([{ name: 'Home', path: '/' }, { name: title, path: Astro.url.pathname }])]}
 >
   <PageHeader eyebrow="Legal" title={title} align="left">

@@ -25,6 +25,7 @@ const { post, headings, related } = Astro.props;
 const { title, description, pubDate, updatedDate, author, tags, cover } = post.data;
 const path = postUrl(post);
 const minutes = readingTime(post.body);
+const hasToc = headings.filter((h) => h.depth === 2 || h.depth === 3).length > 1;
 
 // Social card: the cover resized to 1200×630 JPEG; site default otherwise.
 const ogImage = cover
@@ -119,10 +120,16 @@ const jsonLd = [
 
     <div class="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-16">
       <!-- Mobile: collapsible table of contents above the article -->
-      <details class="rounded-2xl border border-line bg-surface p-5 lg:hidden">
-        <summary class="cursor-pointer text-sm font-semibold">Table of contents</summary>
-        <div class="mt-4"><TableOfContents headings={headings} /></div>
-      </details>
+      {
+        hasToc && (
+          <details class="rounded-2xl border border-line bg-surface p-5 lg:hidden">
+            <summary class="cursor-pointer text-sm font-semibold">Table of contents</summary>
+            <div class="mt-4">
+              <TableOfContents headings={headings} />
+            </div>
+          </details>
+        )
+      }
 
       <div
         class="prose prose-lg max-w-none min-w-0 prose-headings:scroll-mt-24 prose-headings:font-display prose-h2:mt-12 prose-a:underline-offset-4 prose-img:rounded-xl"

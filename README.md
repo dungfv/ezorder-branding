@@ -39,7 +39,6 @@ npm run build && npx wrangler pages dev ./dist
 astro.config.mjs           site URL, i18n, sitemap, self-hosted fonts
 public/
   _headers                 Cloudflare cache + security headers (CSP, HSTS…)
-  _redirects               Cloudflare redirects (/faq → docs)
   robots.txt, favicons, og-default.jpg, logo-512.png
 src/
   assets/docs/             Real document renders from the app (hero, galleries)
@@ -58,7 +57,7 @@ src/
   data/                    site.json, pricing.json (CMS-editable), features, faq, testimonials…
   layouts/                 BaseLayout, BlogPostLayout, LegalLayout
   lib/                     blog helpers, JSON-LD builders, screenshot loader
-  pages/                   index, pricing, about, privacy, terms, 404, blog/…, rss.xml
+  pages/                   index, pricing, faq, about, privacy, terms, 404, blog/…, rss.xml
   styles/global.css        Tailwind + design tokens (light/dark)
 ```
 
@@ -67,12 +66,17 @@ src/
 | What | Where | CMS |
 |---|---|---|
 | Name, tagline, App Store URL, support email, docs URL, socials | `src/data/site.json` | Site settings |
+| FAQ page (`/faq/`) | home FAQ + pricing billing FAQ | — |
 | Plans, prices, early-adopter banner, comparison table, billing FAQ | `src/data/pricing.json` | Pricing |
 | Blog posts | `src/content/blog/*.md` | Blog |
 | Feature grid, document types, how-it-works | `src/data/features.ts` | — |
 | Home FAQ (also FAQPage JSON-LD) | `src/data/faq.ts` | — |
 | Email trigger list | `src/data/email-automation-triggers.ts` | — |
 | Testimonials | `src/data/testimonials.ts` | — |
+
+`site.json` and `pricing.json` are validated with zod at build time (`src/data/site.ts`, `src/data/pricing.ts`): a missing price, a bad currency code or a comparison row with the wrong number of values fails the build with a readable message instead of shipping broken pages. Empty optional blog fields saved by the CMS (`''`/`null`) are treated as "not set". The canonical origin comes from `site` in `astro.config.mjs` only.
+
+**Docs links** (header, footer, CTA, About) appear only when `docsUrl` is set. It is empty for now because `docs.ezorder.io` currently serves another product's documentation.
 
 **Pricing must always match the Shopify App Store listing.** Plans render as one wide card when there is a single plan and as a grid otherwise. Setting `yearlyBilling: true` shows the Monthly/Yearly toggle (pure CSS, no JavaScript) and uses each plan's `priceYearly`. Comparison `values` are one entry per plan, in plan order: `yes`, `no` or a short label.
 
@@ -115,6 +119,10 @@ Body in Markdown. Use ## and ### headings — they build the table of contents.
 
 If you add a field to the blog schema, update both `src/content.config.ts` and `.pages.yml`.
 
+**Before handing the CMS to editors, test once end to end:** upload a cover and an inline image, open and re-save an existing post (the EU post has a table and a blockquote), then check the build. Pages CMS documents absolute media outputs; the relative `../../assets/uploads` output is required by `astro:assets` and should be confirmed on a branch.
+
+**Trust:** Markdown allows raw HTML and the CSP permits inline scripts, so give CMS access only to trusted editors. JSON-LD output is escaped so CMS text can't break out of its `<script>`. A stricter hash-based CSP (Astro's `security.csp`) is a possible follow-up once the inline scripts are moved to bundled scripts.
+
 ## Deploy to Cloudflare Pages
 
 1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → choose the GitHub repo.
@@ -126,7 +134,7 @@ If you add a field to the blog schema, update both `src/content.config.ts` and `
 3. Production branch: `main`. Every other branch and every pull request gets its own preview URL automatically.
 4. Add the custom domain `ezorder.io` (and redirect `www` to it) under **Custom domains**.
 
-`public/_headers` sets long-term immutable caching for fingerprinted `/_astro/*` files, a short cache for the Pagefind index, and security headers (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `nosniff`). If you add a third-party script or form provider, extend the CSP there. `public/_redirects` sends the old `/faq/` path to the docs site.
+`public/_headers` sets long-term immutable caching for fingerprinted `/_astro/*` files, a short cache for the Pagefind index, and security headers (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `nosniff`). If you add a third-party script or form provider, extend the CSP there. The app's email-verification screen links to `https://ezorder.io/faq/`, which is a real page on this site — keep that URL.
 
 ## Contact form
 
@@ -143,7 +151,7 @@ Non-mailto providers include a honeypot field. The CSP `form-action` already all
 
 - `<SEO>` component on every page: title template (`Page | EZ Order Printer`), description, canonical, `hreflang` + `x-default`, Open Graph, Twitter card, per-post OG image.
 - JSON-LD: `Organization` + `WebSite` (all pages), `SoftwareApplication` + `FAQPage` (home), `Product`/`AggregateOffer` + `FAQPage` + `BreadcrumbList` (pricing), `BlogPosting` + `BreadcrumbList` (posts), `BreadcrumbList` (other pages).
-- `@astrojs/sitemap` → `/sitemap-index.xml` (404 excluded), referenced from `robots.txt`.
+- `@astrojs/sitemap` → `/sitemap-index.xml` (404 and the draft `/terms/` excluded; remove the terms filter in `astro.config.mjs` once final), referenced from `robots.txt`. Noindex pages emit no canonical/hreflang.
 - Paginated pages get their own canonical URL and a `Blog – Page N` title.
 - One `h1` per page, landmarks (`header`/`nav`/`main`/`footer`), skip link, `alt` text on every meaningful image.
 - All URLs end with `/` (`trailingSlash: 'always'`), matching how Cloudflare Pages serves `index.html` files.
@@ -163,6 +171,7 @@ Lighthouse 12 on the production build (`npm run build && npm run preview`), 28 S
 | `/about/` | 100 / 100 / 100 / 100 — LCP 1.5 s, CLS 0 | 100 / 100 / 100 / 100 |
 | `/blog/` | 100 / 100 / 100 / 100 — LCP 1.7 s, CLS 0 | 100 / 100 / 100 / 100 |
 | Blog post | 100 / 100 / 100 / 100 — LCP 1.7 s, CLS 0 | 100 / 100 / 100 / 100 |
+| `/faq/` (after review fixes) | 100 / 100 / 100 / 100 | — |
 
 Also verified: no horizontal scroll at 360 px and 768 px on every page in light and dark mode; no console errors with the production CSP (via `wrangler pages dev`); Pagefind search works under the CSP.
 
@@ -194,8 +203,10 @@ Defined as CSS variables in `src/styles/global.css` and exposed to Tailwind (`bg
 - **Product name:** "EZ Order Printer PDF Invoice" (full), "EZ Order Printer" in the header and page titles.
 - **Pricing:** a single **Free** plan with an "early adopter" banner, as requested. Toggle and comparison table stay data-driven for future plans.
 - **Screenshots:** real document renders from the app's App Store assets (sample store "Northbeam Supply Co."), not placeholders. The listing's feature images were not used because they carry an "OZ ORDER" wordmark.
+- **Bulk printing** is advertised as "up to 100 orders" (the app's `MAX_BULK_ORDERS`); the App Store listing's "hundreds" should be aligned too.
+- **Email triggers** list only events the app actually subscribes to ("Order edited" is omitted — see app notes below).
 - **POS copy** matches the POS extension: staff **print** invoice/receipt, packing slip, refund and return slip from the order screen. Download/email from POS is not claimed.
-- **Languages:** "30+" — the app ships 31 document translation files (`translation/seeders`), although older docs and the listing images say 12.
+- **Languages:** "29 languages" — the app ships 31 translation files, which are 29 distinct languages (Portuguese has pt, pt_BR, pt_PT). Older docs and the listing images say 12.
 - **"Made for Shopify"** strip instead of the "Built for Shopify" wording or badge, which may only be shown once the app earns it. No Shopify logos are used.
 - **Privacy page** covers the website and links to the app's canonical policy (`app.ezorder.io/privacy-policy`) instead of duplicating it.
 - **Search UI** is a small custom component on Pagefind's JS API (matches the design, loads nothing until used) instead of Pagefind's default widget.
@@ -204,7 +215,7 @@ Defined as CSS variables in `src/styles/global.css` and exposed to Tailwind (`bg
 ## TODO — information needed
 
 - [ ] **App Store URL** — assumed `https://apps.shopify.com/ez-order-printer` (from the app handle). Confirm.
-- [ ] **Docs domain** — assumed `https://docs.ezorder.io`. Confirm, and confirm the `/faq/` redirect target in `public/_redirects` (the app's email-verification page links to `https://ezorder.io/faq/`).
+- [ ] **Docs URL** — `docs.ezorder.io` currently shows "Uppush Order Limit" docs, so `docsUrl` is empty and Docs links are hidden. Set it in Site settings once EZ Order docs exist.
 - [ ] **Support email** — assumed `support@ezorder.io` (used in the app). Confirm, and confirm the "reply within one business day" promise on `/about/`.
 - [ ] **Pricing** — confirm the Free plan wording, the early-adopter banner text, and whether any usage limits apply. Update when paid plans launch (must match the listing).
 - [ ] **Testimonials** — real App Store reviews (with permission) for `src/data/testimonials.ts`.
@@ -214,5 +225,12 @@ Defined as CSS variables in `src/styles/global.css` and exposed to Tailwind (`bg
 - [ ] **Social links** and X/Twitter handle (`site.json`; empty links are hidden).
 - [ ] **Contact form provider** — keep `mailto` or pick Formspree / Web3Forms / Pages Function.
 - [ ] **Languages** — which locales to add to the website, if any.
-- [ ] **Language count** — confirm "30+" for marketing (vs "12" in older materials).
+- [ ] **Language count** — confirm "29 languages" for marketing (vs "12" in older materials).
+- [ ] **"Powered by EZ Order Printer" PDF footer** — shown by default (`brandingRemoved` flag in the app). Decide whether removal is part of the Free plan and whether the site should say so.
+- [ ] **Bulk limit** — confirm 100 orders per job (or raise it in the app) and align the App Store listing.
+
+## Notes for the app repo (found while writing site copy)
+
+- `orders/edited` and `orders/delete` are not in `EMAIL_TRIGGER_TOPICS` (`app/src/utils/webhook.utils.ts`), yet the automation UI offers "Order edited" / "Order deleted". For edits, `extractOrderId` should read `order_edit.order_id`.
+- `webhook-trigger-map.ts` logs the full `returns/update` payload (customer personal data) with `console.log`.
 - [ ] **Custom template service** — confirm "we'll build it for you / On request" is an offer you want to advertise.

@@ -16,12 +16,14 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
 export const postUrl = (post: BlogPost) => `/blog/${post.id}/`;
 
 export function slugifyTag(tag: string): string {
-  return tag
+  const slug = tag
     .toLowerCase()
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '') // strip accents left by NFKD
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+  if (!slug) throw new Error(`Tag "${tag}" has no URL-safe characters; use a Latin-script tag name.`);
+  return slug;
 }
 
 export const tagUrl = (tag: string) => `/blog/tag/${slugifyTag(tag)}/`;

@@ -30,7 +30,7 @@ const title = page.currentPage > 1 ? `${tag.name} – Page ${page.currentPage}` 
 
 <BaseLayout
   title={title}
-  description={`Articles about ${tag.name.toLowerCase()} for Shopify merchants, from the EZ Order Printer blog.`}
+  description={`Articles tagged “${tag.name}” for Shopify merchants, from the EZ Order Printer blog.`}
   jsonLd={[
     breadcrumbSchema([
       { name: 'Home', path: '/' },

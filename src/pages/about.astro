@@ -23,7 +23,7 @@ const principles = [
   },
 ];
 
-const contactCards: { icon: IconName; title: string; body: string; href: string; cta: string; external?: boolean }[] = [
+const allContactCards: { icon: IconName; title: string; body: string; href: string; cta: string; external?: boolean }[] = [
   {
     icon: 'support',
     title: 'Email support',
@@ -48,6 +48,9 @@ const contactCards: { icon: IconName; title: string; body: string; href: string;
     external: true,
   },
 ];
+
+// Hide the docs card until a docs site is configured.
+const contactCards = allContactCards.filter((card) => card.href !== '');
 ---
 
 <BaseLayout

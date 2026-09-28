@@ -20,7 +20,7 @@ const action = isMailto
     : endpoint;
 
 const fieldClass =
-  'mt-1.5 block w-full rounded-xl border border-line-strong bg-bg px-3.5 py-2.5 text-fg placeholder:text-muted/70 focus:border-mint focus:outline-none focus:ring-2 focus:ring-mint/40';
+  'mt-1.5 block w-full rounded-xl border border-line-strong bg-bg px-3.5 py-2.5 text-fg placeholder:text-muted/70 focus:border-accent';
 ---
 
 <form
@@ -66,7 +66,7 @@ const fieldClass =
   </label>
   <label class="block text-sm font-medium">
     Message
-    <textarea name="message" rows="5" required class={fieldClass}></textarea>
+    <textarea name="message" rows="5" required maxlength="1500" class={fieldClass}></textarea>
   </label>
 
   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

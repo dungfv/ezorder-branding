@@ -11,7 +11,7 @@ const { plans, comparison } = pricing;
 const isSingle = plans.length === 1;
 ---
 
-<div class="overflow-x-auto rounded-(--radius-card) border border-line bg-surface" tabindex="0" aria-labelledby="compare-title">
+<div class="overflow-x-auto rounded-(--radius-card) border border-line bg-surface" tabindex="0" role="region" aria-labelledby="compare-title">
   <table class="w-full min-w-[32rem] border-collapse text-left text-sm">
     <caption class="sr-only">
       {isSingle ? `Features included in the ${plans[0].name} plan` : 'Feature comparison between plans'}

@@ -70,7 +70,7 @@ const withoutImage = documentTypes.filter((doc) => !doc.image);
         </p>
       </div>
       <!-- Wide overview scrolls inside its own frame on small screens; the page never scrolls sideways. -->
-      <div class="doc-frame overflow-x-auto" tabindex="0" aria-label="Template library preview (scrollable)">
+      <div class="doc-frame overflow-x-auto" tabindex="0" role="region" aria-label="Template library preview (scrollable)">
         <Picture
           src={getScreenshot('template-gallery')}
           formats={['avif']}

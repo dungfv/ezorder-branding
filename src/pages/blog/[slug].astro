@@ -6,6 +6,9 @@ import { getPublishedPosts, getRelatedPosts, type BlogPost } from '../../lib/blo
 
 export const getStaticPaths = (async () => {
   const posts = await getPublishedPosts();
+  // A numeric slug would shadow a pagination page (/blog/2/).
+  const numeric = posts.find((post) => /^\d+$/.test(post.id));
+  if (numeric) throw new Error(`Blog post "${numeric.id}" needs a non-numeric file name.`);
   return posts.map((post) => ({
     params: { slug: post.id },
     props: { post, related: getRelatedPosts(post, posts) },

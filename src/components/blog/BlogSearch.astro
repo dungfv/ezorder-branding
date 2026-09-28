@@ -19,7 +19,7 @@ import Icon from '../ui/Icon.astro';
       autocomplete="off"
       spellcheck="false"
       aria-controls="blog-search-results"
-      class="h-12 w-full rounded-full border border-line-strong bg-surface pr-4 pl-11 text-fg placeholder:text-muted focus:border-mint focus:ring-2 focus:ring-mint/40 focus:outline-none"
+      class="h-12 w-full rounded-full border border-line-strong bg-surface pr-4 pl-11 text-fg placeholder:text-muted focus:border-accent"
     />
   </div>
   <p class="sr-only" role="status" aria-live="polite" data-search-status></p>
@@ -42,6 +42,8 @@ import Icon from '../ui/Icon.astro';
   const status = root?.querySelector('[data-search-status]');
 
   let pagefind = null;
+  // Incremented per keystroke; results from an older query are discarded.
+  let searchSeq = 0;
 
   // Built by `pagefind --site dist`; absent in `astro dev`.
   async function loadPagefind() {
@@ -88,19 +90,24 @@ import Icon from '../ui/Icon.astro';
 
   async function search(query) {
     if (!list || !status) return;
+    const seq = ++searchSeq;
+    const isStale = () => seq !== searchSeq || input.value !== query;
     if (!query.trim()) {
       list.hidden = true;
       status.textContent = '';
       return;
     }
     const pf = await loadPagefind();
+    if (isStale()) return;
     if (!pf) {
-      renderMessage('Search is available on the built site (npm run build && npm run preview).');
+      // The index only exists in built output (`npm run build`), not in `astro dev`.
+      renderMessage('Search is unavailable right now. Browse the topics below instead.');
       return;
     }
     const response = await pf.debouncedSearch(query, {}, 200);
-    if (!response) return; // superseded by a newer query
+    if (!response || isStale()) return; // superseded by a newer query
     const results = await Promise.all(response.results.slice(0, 6).map((r) => r.data()));
+    if (isStale()) return;
     status.textContent = `${response.results.length} result${response.results.length === 1 ? '' : 's'}`;
     if (!results.length) {
       renderMessage(`No articles match “${query}”.`);
@@ -130,6 +137,7 @@ import Icon from '../ui/Icon.astro';
   input?.addEventListener('input', () => void search(input.value));
   input?.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && list) {
+      searchSeq++; // cancel any search still in flight
       list.hidden = true;
       input.value = '';
     }

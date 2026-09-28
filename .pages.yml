@@ -25,11 +25,15 @@ content:
         label: Title
         type: string
         required: true
+        options:
+          maxlength: 120
         description: Shown as the page H1 and in search results (max 120 characters).
       - name: description
         label: Description
         type: text
         required: true
+        options:
+          maxlength: 220
         description: Meta description and card summary (max 220 characters).
       - name: pubDate
         label: Publish date
@@ -141,10 +145,9 @@ content:
       - { name: shortName, label: Short name (header, titles), type: string, required: true }
       - { name: tagline, label: Tagline, type: string }
       - { name: description, label: Default meta description, type: text }
-      - { name: url, label: Website URL, type: string }
       - { name: appStoreUrl, label: Shopify App Store URL, type: string }
       - { name: appUrl, label: App URL, type: string }
-      - { name: docsUrl, label: Documentation URL, type: string }
+      - { name: docsUrl, label: Documentation URL (empty hides every Docs link), type: string }
       - { name: privacyPolicyUrl, label: App privacy policy URL, type: string }
       - { name: supportEmail, label: Support email, type: string }
       - { name: companyName, label: Company name, type: string }

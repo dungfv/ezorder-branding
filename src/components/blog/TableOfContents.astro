@@ -11,8 +11,8 @@ const items = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3)
 
 {
   items.length > 1 && (
-    <nav aria-labelledby="toc-title">
-      <p id="toc-title" class="font-mono text-xs font-medium tracking-[0.14em] text-muted uppercase">
+    <nav aria-label="Table of contents">
+      <p class="font-mono text-xs font-medium tracking-[0.14em] text-muted uppercase">
         On this page
       </p>
       <ol class="mt-4 space-y-2 border-l border-line text-sm">

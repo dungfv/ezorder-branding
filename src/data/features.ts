@@ -27,7 +27,7 @@ export const features: Feature[] = [
   {
     icon: 'printer',
     title: 'Print & download PDF',
-    body: 'Render any document from live order data, print it, or save it as a PDF. Select hundreds of orders and get one file in a single job.',
+    body: 'Render any document from live order data, print it, or save it as a PDF. Select up to 100 orders and get one file in a single job.',
   },
   {
     icon: 'mail',
@@ -42,7 +42,7 @@ export const features: Feature[] = [
   {
     icon: 'globe',
     title: 'Multi-currency, multi-language',
-    body: 'Documents follow the customer: the currency they paid in, with correct separators, and labels in 30+ languages including right-to-left.',
+    body: 'Documents follow the customer: the currency they paid in, with correct separators, and labels in 29 languages including right-to-left.',
   },
   {
     icon: 'store',

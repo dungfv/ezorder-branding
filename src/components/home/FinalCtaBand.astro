@@ -12,6 +12,11 @@ const {
   title = 'Send invoices your customers are happy to keep',
   body = 'Install EZ Order Printer, pick a template and print your first branded document in minutes. Free during early access.',
 } = Astro.props;
+
+// Secondary action: the docs when a docs site is configured, otherwise a direct line to support.
+const secondary = site.docsUrl
+  ? { href: site.docsUrl, label: 'Read the docs', external: true }
+  : { href: '/about/#contact', label: 'Contact us', external: false };
 ---
 
 <section aria-labelledby="cta-title" class="container-page mt-24 sm:mt-32">
@@ -27,7 +32,9 @@ const {
     <p class="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-on-brand-muted">{body}</p>
     <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
       <ButtonLink href={site.appStoreUrl} external size="lg" icon="arrow-right">Install on Shopify</ButtonLink>
-      <ButtonLink href={site.docsUrl} external variant="on-brand" size="lg">Read the docs</ButtonLink>
+      <ButtonLink href={secondary.href} external={secondary.external} variant="on-brand" size="lg">
+        {secondary.label}
+      </ButtonLink>
     </div>
   </div>
 </section>

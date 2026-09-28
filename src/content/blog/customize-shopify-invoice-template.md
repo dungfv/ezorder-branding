@@ -60,7 +60,7 @@ Toggle the content blocks your business requires: tax number, registration numbe
 
 ### 5. Adjust wording and languages
 
-Every label on the document can be rewritten — for example "Tax invoice" instead of "Invoice", or "VAT" instead of "Tax". Documents are translated into more than 30 languages and follow the customer's language automatically, so a French customer receives a French invoice without you maintaining a second template.
+Every label on the document can be rewritten — for example "Tax invoice" instead of "Invoice", or "VAT" instead of "Tax". Documents are translated into 29 languages and follow the customer's language automatically, so a French customer receives a French invoice without you maintaining a second template.
 
 ### 6. Test with a real order
 
