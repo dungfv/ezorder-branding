@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ButtonLink from '../components/ui/ButtonLink.astro';
+
+const links = [
+  { label: 'Features', href: '/#features' },
+  { label: 'Pricing', href: '/pricing/' },
+  { label: 'Blog', href: '/blog/' },
+  { label: 'Contact', href: '/about/#contact' },
+];
+---
+
+<BaseLayout title="Page not found" description="The page you are looking for does not exist." noindex>
+  <section class="container-page py-24 text-center sm:py-32">
+    <div class="edge-torn mx-auto w-full max-w-sm rounded-t-2xl bg-surface px-8 pt-8 pb-12 text-left shadow-paper">
+      <p class="font-mono text-xs tracking-[0.14em] text-muted uppercase">Receipt · Error</p>
+      <dl class="mt-5 space-y-2 font-mono text-sm">
+        <div class="leader"><dt>Page requested</dt><dd>1</dd></div>
+        <div class="leader"><dt>Page found</dt><dd>0</dd></div>
+        <div class="leader border-t border-dashed border-line-strong pt-2 font-semibold">
+          <dt>Status</dt><dd>404</dd>
+        </div>
+      </dl>
+    </div>
+    <h1 class="mt-12 text-4xl font-extrabold sm:text-5xl">This page isn't on the order</h1>
+    <p class="mx-auto mt-4 max-w-md text-lg text-muted">
+      The link may be broken or the page may have moved. Try one of these instead.
+    </p>
+    <ul class="mt-8 flex flex-wrap justify-center gap-3">
+      {
+        links.map((link) => (
+          <li>
+            <ButtonLink href={link.href} variant="secondary">{link.label}</ButtonLink>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

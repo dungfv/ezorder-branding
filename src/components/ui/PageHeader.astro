@@ -1,0 +1,25 @@
+---
+/** Top-of-page intro used by inner pages (pricing, about, blog, legal). Holds the page's single h1. */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  align?: 'left' | 'center';
+}
+
+const { eyebrow, title, lead, align = 'center' } = Astro.props;
+---
+
+<header
+  class:list={[
+    'container-page pt-16 pb-4 sm:pt-24',
+    align === 'center' ? 'text-center' : 'text-left',
+  ]}
+>
+  <div class:list={[align === 'center' ? 'mx-auto max-w-3xl' : 'max-w-3xl']}>
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1 class="mt-3 text-4xl leading-[1.05] font-extrabold sm:text-5xl lg:text-6xl">{title}</h1>
+    {lead && <p class="mt-5 text-lg leading-relaxed text-muted sm:text-xl">{lead}</p>}
+    <slot />
+  </div>
+</header>

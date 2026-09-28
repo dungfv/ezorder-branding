@@ -165,3 +165,28 @@
     @apply overflow-hidden rounded-xl bg-white ring-1 ring-black/5 shadow-paper;
   }
 }
+
+/*
+ * Typography plugin colours mapped to our tokens, so long-form content
+ * (blog, legal) follows light/dark automatically. Unlayered on purpose:
+ * it must win over the plugin's defaults.
+ */
+.prose {
+  --tw-prose-body: var(--c-fg);
+  --tw-prose-headings: var(--c-fg);
+  --tw-prose-lead: var(--c-muted);
+  --tw-prose-links: var(--c-accent-text);
+  --tw-prose-bold: var(--c-fg);
+  --tw-prose-counters: var(--c-muted);
+  --tw-prose-bullets: var(--c-line-strong);
+  --tw-prose-hr: var(--c-line);
+  --tw-prose-quotes: var(--c-fg);
+  --tw-prose-quote-borders: var(--c-mint);
+  --tw-prose-captions: var(--c-muted);
+  --tw-prose-kbd: var(--c-fg);
+  --tw-prose-code: var(--c-fg);
+  --tw-prose-pre-code: #e9f1ec;
+  --tw-prose-pre-bg: #0b1a13;
+  --tw-prose-th-borders: var(--c-line-strong);
+  --tw-prose-td-borders: var(--c-line);
+}

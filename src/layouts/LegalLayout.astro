@@ -1,0 +1,29 @@
+---
+/** Long-form legal pages (privacy, terms): page header + readable prose column. */
+import BaseLayout from './BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import { breadcrumbSchema } from '../lib/json-ld-schema-builders';
+
+interface Props {
+  title: string;
+  description: string;
+  lastUpdated: string;
+}
+
+const { title, description, lastUpdated } = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  jsonLd={[breadcrumbSchema([{ name: 'Home', path: '/' }, { name: title, path: Astro.url.pathname }])]}
+>
+  <PageHeader eyebrow="Legal" title={title} align="left">
+    <p class="mt-4 font-mono text-xs tracking-wider text-muted uppercase">Last updated: {lastUpdated}</p>
+  </PageHeader>
+  <div class="container-page mt-8">
+    <article class="prose prose-lg max-w-3xl prose-headings:font-display">
+      <slot />
+    </article>
+  </div>
+</BaseLayout>

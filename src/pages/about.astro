@@ -1,0 +1,132 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import Icon, { type IconName } from '../components/ui/Icon.astro';
+import ContactForm from '../components/contact/ContactForm.astro';
+import { site } from '../data/site';
+import { breadcrumbSchema } from '../lib/json-ld-schema-builders';
+
+// TODO: replace with the real team story and mission statement.
+const principles = [
+  {
+    title: 'Paperwork should be invisible',
+    body: 'The best invoice flow is one merchants set up once and never think about again.',
+  },
+  {
+    title: 'Your brand, on every page',
+    body: 'Documents are a customer touchpoint. They should look like your store, not like a system printout.',
+  },
+  {
+    title: 'Honest software',
+    body: 'Clear pricing through Shopify, data read on demand rather than warehoused, and humans who answer email.',
+  },
+];
+
+const contactCards: { icon: IconName; title: string; body: string; href: string; cta: string; external?: boolean }[] = [
+  {
+    icon: 'support',
+    title: 'Email support',
+    body: 'Questions, bugs or a custom template request. We usually reply within one business day.',
+    href: `mailto:${site.supportEmail}`,
+    cta: site.supportEmail,
+  },
+  {
+    icon: 'book',
+    title: 'Documentation',
+    body: 'Step-by-step guides for templates, automations, POS and the storefront button.',
+    href: site.docsUrl,
+    cta: 'Open the docs',
+    external: true,
+  },
+  {
+    icon: 'bag',
+    title: 'Shopify App Store',
+    body: 'Install the app, read reviews and see the full listing.',
+    href: site.appStoreUrl,
+    cta: 'View the listing',
+    external: true,
+  },
+];
+---
+
+<BaseLayout
+  title="About & contact"
+  description="Meet the team behind EZ Order Printer, our mission for Shopify merchants, and how to reach support."
+  jsonLd={[breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'About', path: '/about/' }])]}
+>
+  <PageHeader
+    eyebrow="About"
+    title="We make order paperwork the easy part of selling"
+    lead="EZ Order Printer is built by a small, independent team of Shopify developers who got tired of watching merchants copy order details into spreadsheets and word processors."
+  />
+
+  <section aria-labelledby="mission-title" class="container-page mt-16">
+    <div class="grid gap-10 rounded-(--radius-card) border border-line bg-surface p-7 sm:p-10 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
+      <SectionHeading
+        id="mission-title"
+        eyebrow="Our mission"
+        title="Every order, properly documented"
+        lead="From the first quote to the final refund, every document your store produces should be accurate, on brand and delivered without anyone lifting a finger."
+      />
+      <ul class="divide-y divide-dashed divide-line-strong">
+        {
+          principles.map((item, index) => (
+            <li class="flex gap-5 py-5 first:pt-0 last:pb-0">
+              <span class="font-mono text-sm text-accent">{String(index + 1).padStart(2, '0')}</span>
+              <span>
+                <span class="block font-display text-lg font-bold">{item.title}</span>
+                <span class="mt-1 block leading-relaxed text-muted">{item.body}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="team-title" class="container-page mt-24">
+    <SectionHeading
+      id="team-title"
+      eyebrow="The team"
+      title="Small team, direct line"
+      lead="We are a remote team of engineers and designers who have built Shopify apps for years. When you email support, you reach the people who write the code."
+    />
+  </section>
+
+  <section id="contact" aria-labelledby="contact-title" class="container-page mt-24">
+    <SectionHeading id="contact-title" eyebrow="Contact" title="Talk to us" />
+    <ul class="mt-10 grid gap-4 md:grid-cols-3">
+      {
+        contactCards.map((card) => (
+          <li class="flex flex-col rounded-(--radius-card) border border-line bg-surface p-6">
+            <span class="grid size-11 place-items-center rounded-xl bg-mint-soft text-accent">
+              <Icon name={card.icon} size={22} />
+            </span>
+            <h3 class="mt-5 text-lg font-bold">{card.title}</h3>
+            <p class="mt-1 flex-1 text-[0.9375rem] leading-relaxed text-muted">{card.body}</p>
+            <a
+              href={card.href}
+              class="mt-5 inline-flex items-center gap-1.5 font-semibold text-accent underline-offset-4 hover:underline"
+              {...(card.external ? { target: '_blank', rel: 'noopener' } : {})}
+            >
+              {card.cta}
+              <Icon name={card.external ? 'external' : 'arrow-right'} size={15} strokeWidth={2} />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-10 grid gap-10 rounded-(--radius-card) border border-line bg-surface p-7 sm:p-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+      <div>
+        <h3 class="text-2xl font-bold">Send us a message</h3>
+        <p class="mt-3 leading-relaxed text-muted">
+          Tell us what you need — a question about a setting, a document layout you want recreated, or
+          feedback on the app. Include your store URL so we can look into it faster.
+        </p>
+      </div>
+      <ContactForm />
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,66 @@
+---
+/**
+ * Detailed feature table. One column per plan; cells are "yes" (check),
+ * "no" (dash) or a short label. With a single plan it reads as
+ * "everything included".
+ */
+import Icon from '../ui/Icon.astro';
+import { pricing } from '../../data/pricing';
+
+const { plans, comparison } = pricing;
+const isSingle = plans.length === 1;
+---
+
+<div class="overflow-x-auto rounded-(--radius-card) border border-line bg-surface" tabindex="0" aria-labelledby="compare-title">
+  <table class="w-full min-w-[32rem] border-collapse text-left text-sm">
+    <caption class="sr-only">
+      {isSingle ? `Features included in the ${plans[0].name} plan` : 'Feature comparison between plans'}
+    </caption>
+    <thead>
+      <tr class="border-b border-line">
+        <th scope="col" class="px-5 py-4 font-mono text-xs font-medium tracking-[0.12em] text-muted uppercase sm:px-6">
+          Feature
+        </th>
+        {
+          plans.map((plan) => (
+            <th scope="col" class="w-32 px-5 py-4 text-center font-display text-base font-bold sm:px-6">
+              {plan.name}
+            </th>
+          ))
+        }
+      </tr>
+    </thead>
+    {
+      comparison.map((group) => (
+        <tbody>
+          <tr class="bg-surface-muted">
+            <th scope="colgroup" colspan={plans.length + 1} class="px-5 py-2.5 text-xs font-semibold tracking-wide uppercase sm:px-6">
+              {group.group}
+            </th>
+          </tr>
+          {group.rows.map((row) => (
+            <tr class="border-t border-line">
+              <th scope="row" class="px-5 py-3.5 font-normal sm:px-6">
+                {row.feature}
+              </th>
+              {plans.map((plan, index) => {
+                const value = row.values[index] ?? 'no';
+                return (
+                  <td class="px-5 py-3.5 text-center sm:px-6">
+                    {value === 'yes' ? (
+                      <Icon name="check" size={18} strokeWidth={2.5} class="mx-auto text-accent" label={`Included in ${plan.name}`} />
+                    ) : value === 'no' ? (
+                      <Icon name="minus" size={18} class="mx-auto text-muted" label={`Not included in ${plan.name}`} />
+                    ) : (
+                      <span class="font-medium">{value}</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      ))
+    }
+  </table>
+</div>

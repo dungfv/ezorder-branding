@@ -1,0 +1,55 @@
+---
+/**
+ * TODO: placeholder terms of service. Replace with the reviewed legal text
+ * (and the registered entity name/address) before launch.
+ */
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { site } from '../data/site';
+---
+
+<LegalLayout
+  title="Terms of service"
+  description="Terms of service for the EZ Order Printer Shopify app and the ezorder.io website."
+  lastUpdated="28 September 2026"
+>
+  <p class="not-prose rounded-xl border border-dashed border-line-strong bg-surface-muted p-4 text-sm text-muted">
+    These terms are a working draft and will be replaced by the final terms of service.
+  </p>
+
+  <h2>1. The service</h2>
+  <p>
+    {site.name} (“the App”) is a Shopify application that generates, prints, downloads and emails
+    order documents using data from your Shopify store. These terms apply to the App and to the
+    ezorder.io website.
+  </p>
+
+  <h2>2. Your account</h2>
+  <p>
+    You use the App through your Shopify store. You are responsible for the content of your templates,
+    for the accuracy of the business and tax details you add to documents, and for complying with the
+    invoicing rules that apply to your business.
+  </p>
+
+  <h2>3. Plans and billing</h2>
+  <p>
+    The App is currently free. Any paid plan will be billed through Shopify, shown before you approve
+    it, and can be cancelled by uninstalling the App.
+  </p>
+
+  <h2>4. Acceptable use</h2>
+  <p>
+    Do not use the App to send unsolicited email, to impersonate others, or in breach of Shopify's
+    terms or applicable law.
+  </p>
+
+  <h2>5. Data</h2>
+  <p>
+    How we handle data is described in the <a href={site.privacyPolicyUrl}>app privacy policy</a>.
+  </p>
+
+  <h2>6. Changes and contact</h2>
+  <p>
+    We may update these terms and will note the date above. Questions:
+    <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>.
+  </p>
+</LegalLayout>

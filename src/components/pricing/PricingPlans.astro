@@ -1,0 +1,110 @@
+---
+/**
+ * Plan cards driven by `data/pricing.json`.
+ * - One plan: a single wide card (price + CTA left, features right).
+ * - Several plans: a grid, one card per plan.
+ * The Monthly/Yearly toggle is CSS-only (radio + :has) and only rendered
+ * when `yearlyBilling` is enabled in the data.
+ */
+import Icon from '../ui/Icon.astro';
+import ButtonLink from '../ui/ButtonLink.astro';
+import { formatPrice, pricing } from '../../data/pricing';
+import { site } from '../../data/site';
+
+const { plans, yearlyBilling } = pricing;
+const isSingle = plans.length === 1;
+const gridCols = { 2: 'md:grid-cols-2', 3: 'md:grid-cols-3', 4: 'md:grid-cols-2 lg:grid-cols-4' }[
+  plans.length
+];
+---
+
+<div class="pricing-plans">
+  {
+    yearlyBilling && (
+      <fieldset class="mx-auto mb-10 flex w-fit rounded-full border border-line bg-surface p-1 text-sm font-semibold">
+        <legend class="sr-only">Billing period</legend>
+        <input type="radio" name="billing" id="billing-monthly" value="monthly" class="sr-only" checked />
+        <label for="billing-monthly" class="billing-option cursor-pointer rounded-full px-4 py-2">
+          Monthly
+        </label>
+        <input type="radio" name="billing" id="billing-yearly" value="yearly" class="sr-only" />
+        <label for="billing-yearly" class="billing-option cursor-pointer rounded-full px-4 py-2">
+          Yearly
+        </label>
+      </fieldset>
+    )
+  }
+
+  <ul class:list={['grid gap-6', !isSingle && gridCols]}>
+    {
+      plans.map((plan) => (
+        <li
+          class:list={[
+            'relative rounded-(--radius-card) border bg-surface p-7 sm:p-10',
+            plan.highlight ? 'border-mint shadow-paper ring-1 ring-mint' : 'border-line',
+            isSingle && 'grid gap-10 md:grid-cols-[1fr_1.3fr] md:items-center',
+          ]}
+        >
+          <div>
+            <h2 class="font-display text-2xl font-bold">{plan.name}</h2>
+            <p class="mt-1 text-muted">{plan.tagline}</p>
+
+            <p class="mt-6 flex items-baseline gap-2">
+              <span class="price-monthly font-display text-6xl font-extrabold tracking-tight">
+                {formatPrice(plan.priceMonthly)}
+              </span>
+              {yearlyBilling && (
+                <span class="price-yearly hidden font-display text-6xl font-extrabold tracking-tight">
+                  {formatPrice(plan.priceYearly)}
+                </span>
+              )}
+              <span class="text-muted">/ month</span>
+            </p>
+            {plan.priceNote && (
+              <p class="mt-2 font-mono text-xs font-medium tracking-[0.12em] text-accent uppercase">
+                {plan.priceNote}
+              </p>
+            )}
+
+            <ButtonLink href={site.appStoreUrl} external size="lg" icon="arrow-right" class="mt-8 w-full sm:w-auto">
+              {plan.ctaLabel}
+            </ButtonLink>
+            <p class="mt-3 text-sm text-muted">Billed through Shopify. No credit card required.</p>
+          </div>
+
+          <ul class:list={['space-y-3', isSingle ? 'md:border-l md:border-dashed md:border-line-strong md:pl-10' : 'mt-8']}>
+            {plan.features.map((feature) => (
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-mint-soft text-accent">
+                  <Icon name="check" size={13} strokeWidth={3} />
+                </span>
+                <span class="leading-relaxed">{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  /* CSS-only Monthly/Yearly toggle (no island needed). */
+  .billing-option {
+    color: var(--c-muted);
+  }
+  input:checked + .billing-option {
+    background: var(--c-brand);
+    color: var(--c-on-brand);
+  }
+  input:focus-visible + .billing-option {
+    outline: 2px solid var(--c-mint);
+    outline-offset: 2px;
+  }
+  .pricing-plans:has(#billing-yearly:checked) .price-monthly {
+    display: none;
+  }
+  .pricing-plans:has(#billing-yearly:checked) .price-yearly {
+    display: inline;
+  }
+</style>

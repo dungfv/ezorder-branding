@@ -1,0 +1,55 @@
+---
+/**
+ * Website privacy notice. The app's full privacy policy lives in the app
+ * (canonical: site.privacyPolicyUrl) and is linked, not duplicated, so there
+ * is a single source of truth for App Store review.
+ */
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { site } from '../data/site';
+---
+
+<LegalLayout
+  title="Privacy"
+  description="How ezorder.io handles visitor data, and where to find the full EZ Order Printer app privacy policy."
+  lastUpdated="28 September 2026"
+>
+  <p>
+    This page covers the <strong>ezorder.io website</strong>. If you are looking for how the EZ Order
+    Printer <strong>Shopify app</strong> handles store, order and customer data, read the
+    <a href={site.privacyPolicyUrl}>full app privacy policy</a>.
+  </p>
+
+  <h2>What this website collects</h2>
+  <ul>
+    <li>
+      <strong>No cookies, no analytics, no advertising pixels.</strong> The site is a set of static pages.
+      We do not track you across pages or sites.
+    </li>
+    <li>
+      <strong>Hosting logs.</strong> The site is served by Cloudflare Pages. Like any web host, Cloudflare
+      processes technical request data (IP address, user agent, requested URL) to deliver pages and
+      protect against abuse.
+    </li>
+    <li>
+      <strong>Search stays in your browser.</strong> Blog search runs entirely on your device; your
+      queries are never sent to us.
+    </li>
+    <li>
+      <strong>Messages you send us.</strong> If you use the contact form or email
+      <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>, we receive the details you
+      include and use them only to answer you.
+    </li>
+  </ul>
+
+  <h2>Links to other sites</h2>
+  <p>
+    The site links to the Shopify App Store, our documentation and the app itself. Those services are
+    governed by their own privacy policies.
+  </p>
+
+  <h2>Your rights and contact</h2>
+  <p>
+    To ask about, correct or delete information you have sent us, email
+    <a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a>.
+  </p>
+</LegalLayout>

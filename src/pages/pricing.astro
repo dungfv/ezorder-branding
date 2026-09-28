@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/ui/PageHeader.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import FaqList from '../components/ui/FaqList.astro';
+import Icon from '../components/ui/Icon.astro';
+import PricingPlans from '../components/pricing/PricingPlans.astro';
+import PlanComparisonTable from '../components/pricing/PlanComparisonTable.astro';
+import FinalCtaBand from '../components/home/FinalCtaBand.astro';
+import { pricing } from '../data/pricing';
+import { breadcrumbSchema, faqPageSchema, pricingOffersSchema } from '../lib/json-ld-schema-builders';
+
+const { notice, plans, faq, currency } = pricing;
+const isSingle = plans.length === 1;
+
+const jsonLd = [
+  pricingOffersSchema(plans, currency),
+  faqPageSchema(faq),
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Pricing', path: '/pricing/' },
+  ]),
+];
+---
+
+<BaseLayout
+  title="Pricing"
+  description="EZ Order Printer pricing: every feature free during early access. Invoices, packing slips, PDF emails and automation for Shopify, billed through Shopify."
+  jsonLd={jsonLd}
+>
+  <PageHeader
+    eyebrow="Pricing"
+    title={isSingle ? 'Every feature. Free while we grow.' : 'Simple pricing that grows with you'}
+    lead="Invoices, packing slips, refunds, quotes, PDF emails and automations — billed through Shopify, never by card."
+  />
+
+  <div class="container-page mt-10">
+    {
+      notice.enabled && (
+        <aside
+          class="mx-auto mb-8 flex max-w-4xl flex-col gap-3 rounded-2xl bg-mint-soft px-5 py-4 sm:flex-row sm:items-start sm:gap-4 sm:px-6"
+          aria-label={notice.label}
+        >
+          <span class="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full bg-brand px-2.5 py-1 font-mono text-[0.6875rem] font-medium tracking-wider text-mint uppercase">
+            <Icon name="zap" size={12} strokeWidth={2.5} />
+            {notice.label}
+          </span>
+          <p class="text-sm leading-relaxed">
+            <strong class="font-semibold">{notice.title}.</strong> {notice.body}
+          </p>
+        </aside>
+      )
+    }
+
+    <div class:list={[isSingle && 'mx-auto max-w-4xl']}>
+      <PricingPlans />
+    </div>
+  </div>
+
+  <section aria-labelledby="compare-title" class="container-page mt-24">
+    <SectionHeading
+      id="compare-title"
+      eyebrow="Details"
+      title={isSingle ? 'Everything included' : 'Compare plans'}
+      align="center"
+    />
+    <div class="mx-auto mt-10 max-w-4xl">
+      <PlanComparisonTable />
+    </div>
+  </section>
+
+  <section aria-labelledby="billing-faq-title" class="container-page mt-24">
+    <div class="mx-auto grid max-w-5xl gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+      <SectionHeading
+        id="billing-faq-title"
+        eyebrow="Billing FAQ"
+        title="Billing, trials and plan changes"
+      />
+      <FaqList items={faq} />
+    </div>
+  </section>
+
+  <FinalCtaBand title="Start free today" />
+</BaseLayout>
