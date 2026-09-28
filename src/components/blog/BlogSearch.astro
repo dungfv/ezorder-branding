@@ -32,25 +32,23 @@ import Icon from '../ui/Icon.astro';
   </ul>
 </div>
 
-<script>
-  type PagefindResult = { data: () => Promise<{ url: string; excerpt: string; meta: { title?: string } }> };
-  type Pagefind = {
-    debouncedSearch: (q: string, opts?: object, ms?: number) => Promise<{ results: PagefindResult[] } | null>;
-  };
+<script is:inline type="module">
+  // is:inline on purpose: Vite would wrap the dynamic import below in a preload
+  // helper that breaks in inline module scripts. Plain JS, no bundling needed.
 
-  const root = document.querySelector<HTMLElement>('[data-blog-search]');
-  const input = root?.querySelector<HTMLInputElement>('input');
-  const list = root?.querySelector<HTMLUListElement>('[data-search-results]');
-  const status = root?.querySelector<HTMLElement>('[data-search-status]');
+  const root = document.querySelector('[data-blog-search]');
+  const input = root?.querySelector('input');
+  const list = root?.querySelector('[data-search-results]');
+  const status = root?.querySelector('[data-search-status]');
 
-  let pagefind: Pagefind | null = null;
+  let pagefind = null;
 
   // Built by `pagefind --site dist`; absent in `astro dev`.
-  async function loadPagefind(): Promise<Pagefind | null> {
+  async function loadPagefind() {
     if (pagefind) return pagefind;
     try {
       const url = '/pagefind/pagefind.js';
-      pagefind = (await import(/* @vite-ignore */ url)) as Pagefind;
+      pagefind = await import(url);
     } catch {
       pagefind = null;
     }
@@ -62,7 +60,7 @@ import Icon from '../ui/Icon.astro';
    * <template> parsing is inert (no scripts, no image loads), so this is XSS-safe
    * whether or not the excerpt arrives entity-encoded.
    */
-  function safeExcerpt(html: string): DocumentFragment {
+  function safeExcerpt(html) {
     const template = document.createElement('template');
     template.innerHTML = html;
     const fragment = document.createDocumentFragment();
@@ -78,7 +76,7 @@ import Icon from '../ui/Icon.astro';
     return fragment;
   }
 
-  function renderMessage(text: string) {
+  function renderMessage(text) {
     if (!list) return;
     list.replaceChildren();
     const li = document.createElement('li');
@@ -88,7 +86,7 @@ import Icon from '../ui/Icon.astro';
     list.hidden = false;
   }
 
-  async function search(query: string) {
+  async function search(query) {
     if (!list || !status) return;
     if (!query.trim()) {
       list.hidden = true;
@@ -137,7 +135,7 @@ import Icon from '../ui/Icon.astro';
     }
   });
   document.addEventListener('click', (event) => {
-    if (list && root && !root.contains(event.target as Node)) list.hidden = true;
+    if (list && root && !root.contains(event.target)) list.hidden = true;
   });
 </script>
 
