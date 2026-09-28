@@ -1,0 +1,28 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro';
+import { howItWorks } from '../../data/features';
+---
+
+<section aria-labelledby="how-title" class="container-page mt-24 sm:mt-32">
+  <SectionHeading
+    id="how-title"
+    eyebrow="03 · How it works"
+    title="Up and running before your next order"
+    align="center"
+  />
+
+  <ol class="mt-14 grid gap-4 md:grid-cols-3">
+    {
+      howItWorks.map((step, index) => (
+        <li class="relative rounded-(--radius-card) border border-line bg-surface p-7">
+          <span class="leader font-mono text-xs font-medium tracking-[0.14em] text-muted uppercase">
+            <span>Step</span>
+            <span class="text-accent">{String(index + 1).padStart(2, '0')}</span>
+          </span>
+          <h3 class="mt-6 text-xl font-bold">{step.title}</h3>
+          <p class="mt-2 leading-relaxed text-muted">{step.body}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>

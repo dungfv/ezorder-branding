@@ -1,0 +1,51 @@
+---
+import Icon from '../ui/Icon.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { features } from '../../data/features';
+
+// Shipped features fill the grid; roadmap items get their own strip so they never read as available.
+const shipped = features.filter((feature) => !feature.roadmap);
+const roadmap = features.filter((feature) => feature.roadmap);
+---
+
+<section id="features" aria-labelledby="features-title" class="container-page mt-24 sm:mt-32">
+  <SectionHeading
+    id="features-title"
+    eyebrow="01 · Features"
+    title="Everything between “order placed” and “paperwork done”"
+    lead="One app for the documents your store sends, prints and hands over — branded once, delivered everywhere."
+  />
+
+  <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      shipped.map((feature) => (
+        <li class="rounded-(--radius-card) border border-line bg-surface p-6 transition-colors hover:border-line-strong">
+          <span class="grid size-11 place-items-center rounded-xl bg-mint-soft text-accent">
+            <Icon name={feature.icon} size={22} />
+          </span>
+          <h3 class="mt-5 text-lg font-bold">{feature.title}</h3>
+          <p class="mt-2 text-[0.9375rem] leading-relaxed text-muted">{feature.body}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  {
+    roadmap.map((feature) => (
+      <div class="mt-4 flex flex-col gap-4 rounded-(--radius-card) border border-dashed border-line-strong p-6 sm:flex-row sm:items-center">
+        <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-muted text-muted">
+          <Icon name={feature.icon} size={22} />
+        </span>
+        <div class="flex-1">
+          <h3 class="flex flex-wrap items-center gap-x-3 gap-y-1 text-lg font-bold">
+            {feature.title}
+            <span class="rounded-full bg-surface-muted px-2.5 py-1 font-mono text-[0.6875rem] font-medium tracking-wider text-muted uppercase">
+              On the roadmap
+            </span>
+          </h3>
+          <p class="mt-1 text-[0.9375rem] leading-relaxed text-muted">{feature.body}</p>
+        </div>
+      </div>
+    ))
+  }
+</section>

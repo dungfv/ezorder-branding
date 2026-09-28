@@ -1,0 +1,107 @@
+---
+/**
+ * Bento grid: multi-language, multi-currency and Shopify POS.
+ */
+import { Picture } from 'astro:assets';
+import Icon from '../ui/Icon.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { getScreenshot } from '../../lib/document-screenshots';
+
+const posPoints = [
+  'Print the receipt or packing slip at the counter',
+  'Download the PDF on the POS device',
+  'Email the invoice before the customer leaves',
+];
+---
+
+<section aria-labelledby="global-title" class="container-page mt-24 sm:mt-32">
+  <SectionHeading
+    id="global-title"
+    eyebrow="05 · Global selling"
+    title="Sell in every market, on every channel"
+    lead="Documents follow the customer — their language, their currency, and wherever they bought: online or in person."
+  />
+
+  <div class="mt-12 grid gap-4 lg:grid-cols-6">
+    <!-- Languages -->
+    <article class="overflow-hidden rounded-(--radius-card) border border-line bg-surface lg:col-span-4">
+      <div class="p-6 sm:p-8">
+        <span class="grid size-11 place-items-center rounded-xl bg-mint-soft text-accent">
+          <Icon name="languages" size={22} />
+        </span>
+        <h3 class="mt-5 text-xl font-bold">30+ languages, right-to-left included</h3>
+        <p class="mt-2 max-w-lg leading-relaxed text-muted">
+          The customer's locale is detected automatically and every label follows it. Adjust any
+          wording yourself — Arabic and Hebrew documents flip to right-to-left.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 px-6 sm:px-8" aria-hidden="true">
+        {
+          ['lang-ja', 'lang-ar'].map((key) => (
+            <div class="doc-frame translate-y-2 rounded-b-none">
+              <Picture
+                src={getScreenshot(key)}
+                formats={['avif', 'webp']}
+                widths={[320, 480, 720]}
+                sizes="(min-width: 1024px) 330px, 45vw"
+                alt=""
+                class="h-auto w-full"
+              />
+            </div>
+          ))
+        }
+      </div>
+    </article>
+
+    <!-- Currency -->
+    <article class="overflow-hidden rounded-(--radius-card) border border-line bg-surface lg:col-span-2">
+      <div class="p-6 sm:p-8">
+        <span class="grid size-11 place-items-center rounded-xl bg-mint-soft text-accent">
+          <Icon name="coins" size={22} />
+        </span>
+        <h3 class="mt-5 text-xl font-bold">Any currency</h3>
+        <p class="mt-2 leading-relaxed text-muted">
+          Totals print in the currency the customer paid, with the right symbol, separators and decimals.
+        </p>
+      </div>
+      <div class="relative px-6 pb-6 sm:px-8 sm:pb-8" aria-hidden="true">
+        <div class="doc-frame">
+          <Picture
+            src={getScreenshot('currency-jpy')}
+            formats={['avif', 'webp']}
+            widths={[320, 480, 760]}
+            sizes="(min-width: 1024px) 300px, 90vw"
+            alt=""
+            class="h-auto w-full"
+          />
+        </div>
+      </div>
+    </article>
+
+    <!-- POS -->
+    <article
+      class="flex flex-col justify-between gap-8 rounded-(--radius-card) bg-brand p-6 text-on-brand sm:p-8 lg:col-span-6 lg:flex-row lg:items-center"
+    >
+      <div class="max-w-xl">
+        <span class="grid size-11 place-items-center rounded-xl bg-white/10 text-mint">
+          <Icon name="pos" size={22} />
+        </span>
+        <h3 class="mt-5 text-2xl font-bold">At the counter with Shopify POS</h3>
+        <p class="mt-2 leading-relaxed text-on-brand-muted">
+          Same templates, same branding — in your physical store. Pull up any order in Shopify POS and
+          hand over a proper document.
+        </p>
+      </div>
+      <ul class="space-y-3 lg:min-w-[22rem]">
+        {
+          posPoints.map((point) => (
+            <li class="flex items-center gap-3 rounded-xl bg-white/6 px-4 py-3 ring-1 ring-brand-line">
+              <Icon name="check" size={16} strokeWidth={2.5} class="shrink-0 text-mint" />
+              <span class="text-sm">{point}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </article>
+  </div>
+</section>

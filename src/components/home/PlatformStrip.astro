@@ -1,0 +1,28 @@
+---
+/**
+ * "Made for Shopify" strip listing every surface the app runs on.
+ * Note: do not use the official "Built for Shopify" badge unless the app has earned it.
+ */
+import Icon from '../ui/Icon.astro';
+import { platformSurfaces } from '../../data/features';
+---
+
+<section aria-label="Where EZ Order Printer works" class="container-page mt-10 sm:mt-14">
+  <div
+    class="flex flex-col items-center gap-5 rounded-2xl border border-dashed border-line-strong px-5 py-5 sm:flex-row sm:justify-between sm:px-8"
+  >
+    <p class="font-mono text-xs font-medium tracking-[0.14em] text-muted uppercase">
+      Made for Shopify &amp; Shopify POS
+    </p>
+    <ul class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-semibold sm:flex sm:gap-10">
+      {
+        platformSurfaces.map((surface) => (
+          <li class="inline-flex items-center gap-2">
+            <Icon name={surface.icon} size={18} class="text-accent" />
+            {surface.label}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

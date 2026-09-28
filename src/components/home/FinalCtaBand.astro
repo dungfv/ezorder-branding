@@ -1,0 +1,33 @@
+---
+/** Closing call to action on the brand band. Reused on pricing and about pages. */
+import ButtonLink from '../ui/ButtonLink.astro';
+import { site } from '../../data/site';
+
+interface Props {
+  title?: string;
+  body?: string;
+}
+
+const {
+  title = 'Send invoices your customers are happy to keep',
+  body = 'Install EZ Order Printer, pick a template and print your first branded document in minutes. Free during early access.',
+} = Astro.props;
+---
+
+<section aria-labelledby="cta-title" class="container-page mt-24 sm:mt-32">
+  <div
+    class="relative isolate overflow-hidden rounded-[1.75rem] bg-brand px-6 py-14 text-center text-on-brand sm:rounded-[2.25rem] sm:px-12 sm:py-20"
+  >
+    <div
+      class="absolute inset-0 -z-10 bg-[radial-gradient(40rem_20rem_at_50%_120%,rgb(44_217_127/0.22),transparent_70%)]"
+      aria-hidden="true"
+    >
+    </div>
+    <h2 id="cta-title" class="mx-auto max-w-2xl text-3xl leading-tight font-bold sm:text-5xl">{title}</h2>
+    <p class="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-on-brand-muted">{body}</p>
+    <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+      <ButtonLink href={site.appStoreUrl} external size="lg" icon="arrow-right">Install on Shopify</ButtonLink>
+      <ButtonLink href={site.docsUrl} external variant="on-brand" size="lg">Read the docs</ButtonLink>
+    </div>
+  </div>
+</section>

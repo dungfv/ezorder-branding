@@ -1,0 +1,94 @@
+---
+/**
+ * Webhook-driven email automation: copy on the left, an HTML mock of an
+ * automation rule on the right (crisp at any size, no image weight).
+ */
+import Icon from '../ui/Icon.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { emailTriggerGroups } from '../../data/email-automation-triggers';
+
+const points = [
+  'Pick the Shopify event that sends each document',
+  'Filter by order tags or customer tags',
+  'Sent in the customer’s language, with the PDF attached',
+  'Delivered from your own verified sender address',
+];
+
+const rule = [
+  { label: 'When', value: 'Order paid' },
+  { label: 'Send', value: 'Invoice / Receipt' },
+  { label: 'To', value: 'Customer' },
+  { label: 'Only if', value: 'Customer tag = wholesale' },
+  { label: 'Attach', value: 'invoice-1117.pdf' },
+];
+---
+
+<section id="automation" aria-labelledby="automation-title" class="container-page mt-24 sm:mt-32">
+  <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+    <div>
+      <SectionHeading
+        id="automation-title"
+        eyebrow="04 · Automation"
+        title="The invoice sends itself — PDF already attached"
+        lead="Turn Shopify webhooks into delivered paperwork. Choose the moment, set the conditions, and the right document leaves on its own."
+      />
+      <ul class="mt-8 space-y-3">
+        {
+          points.map((point) => (
+            <li class="flex items-start gap-3">
+              <span class="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-mint text-on-mint">
+                <Icon name="check" size={13} strokeWidth={3} />
+              </span>
+              <span>{point}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="relative">
+      <!-- Mock automation rule -->
+      <figure
+        class="rounded-(--radius-card) border border-line bg-surface p-6 shadow-paper sm:p-8"
+        aria-label="Example automation rule"
+      >
+        <div class="flex items-center justify-between gap-4">
+          <span class="flex items-center gap-2 font-display font-bold">
+            <Icon name="zap" size={18} class="text-accent" />
+            Wholesale invoices
+          </span>
+          <span class="rounded-full bg-mint-soft px-2.5 py-1 text-xs font-semibold text-accent">Active</span>
+        </div>
+        <dl class="mt-6 space-y-3 font-mono text-sm">
+          {
+            rule.map((row) => (
+              <div class="leader">
+                <dt class="text-muted">{row.label}</dt>
+                <dd class="text-right font-medium">{row.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </figure>
+
+      <div class="mt-6">
+        <p class="text-sm font-semibold">Available triggers</p>
+        <ul class="mt-3 flex flex-wrap gap-2">
+          {
+            emailTriggerGroups.flatMap((group) =>
+              group.triggers.map((trigger) => (
+                <li
+                  class="rounded-full border border-line bg-surface px-3 py-1 text-xs text-muted"
+                  title={group.document}
+                >
+                  {trigger}
+                </li>
+              )),
+            )
+          }
+          <li class="rounded-full px-3 py-1 text-xs font-medium text-accent">and more</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

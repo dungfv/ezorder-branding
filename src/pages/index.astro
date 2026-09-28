@@ -1,4 +1,44 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroSection from '../components/home/HeroSection.astro';
+import PlatformStrip from '../components/home/PlatformStrip.astro';
+import FeatureGridSection from '../components/home/FeatureGridSection.astro';
+import DocumentTypesSection from '../components/home/DocumentTypesSection.astro';
+import HowItWorksSection from '../components/home/HowItWorksSection.astro';
+import EmailAutomationSection from '../components/home/EmailAutomationSection.astro';
+import GlobalSellingSection from '../components/home/GlobalSellingSection.astro';
+import TestimonialsSection from '../components/home/TestimonialsSection.astro';
+import FinalCtaBand from '../components/home/FinalCtaBand.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import FaqList from '../components/ui/FaqList.astro';
+import { homeFaq } from '../data/faq';
+import { pricing } from '../data/pricing';
+import { faqPageSchema, softwareApplicationSchema } from '../lib/json-ld-schema-builders';
+
+const jsonLd = [softwareApplicationSchema(pricing.plans, pricing.currency), faqPageSchema(homeFaq)];
 ---
-<BaseLayout><h1 class="container-page py-20 text-5xl">Hello</h1></BaseLayout>
+
+<BaseLayout jsonLd={jsonLd}>
+  <HeroSection />
+  <PlatformStrip />
+  <FeatureGridSection />
+  <DocumentTypesSection />
+  <HowItWorksSection />
+  <EmailAutomationSection />
+  <GlobalSellingSection />
+  <TestimonialsSection />
+
+  <section id="faq" aria-labelledby="faq-title" class="container-page mt-24 sm:mt-32">
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
+      <SectionHeading
+        id="faq-title"
+        eyebrow="FAQ"
+        title="Questions merchants ask"
+        lead="Can't find your answer? Our docs cover every setting, or email us and a human replies."
+      />
+      <FaqList items={homeFaq} />
+    </div>
+  </section>
+
+  <FinalCtaBand />
+</BaseLayout>

@@ -1,0 +1,39 @@
+---
+/**
+ * Merchant quotes. Hidden entirely when there is nothing real to show
+ * (placeholders are dev-only, see data/testimonials.ts).
+ */
+import Icon from '../ui/Icon.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { testimonials } from '../../data/testimonials';
+---
+
+{
+  testimonials.length > 0 && (
+    <section aria-labelledby="testimonials-title" class="container-page mt-24 sm:mt-32">
+      <SectionHeading
+        id="testimonials-title"
+        eyebrow="06 · Merchants"
+        title="Less paperwork, fewer “resend my invoice” emails"
+        align="center"
+      />
+      <ul class="mt-12 grid gap-4 md:grid-cols-3">
+        {testimonials.map((item) => (
+          <li class="flex flex-col rounded-(--radius-card) border border-line bg-surface p-7">
+            <Icon name="quote" size={22} class="text-accent" />
+            <blockquote class="mt-4 flex-1 text-[1.0625rem] leading-relaxed">{item.quote}</blockquote>
+            <p class="mt-6 border-t border-dashed border-line-strong pt-4 text-sm">
+              <span class="block font-semibold">{item.author}</span>
+              <span class="text-muted">{item.role}</span>
+              {item.placeholder && (
+                <span class="ml-2 rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[0.6875rem] text-muted uppercase">
+                  Placeholder
+                </span>
+              )}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

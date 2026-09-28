@@ -1,0 +1,134 @@
+---
+/**
+ * Home hero: brand band with headline, CTAs and a stack of real documents.
+ * The front invoice is the LCP element, so it loads eagerly with high priority.
+ */
+import { Picture } from 'astro:assets';
+import ButtonLink from '../ui/ButtonLink.astro';
+import Icon from '../ui/Icon.astro';
+import { site } from '../../data/site';
+import { getScreenshot } from '../../lib/document-screenshots';
+
+const proofPoints = ['No credit card', '14 templates', '30+ languages'];
+---
+
+<section aria-labelledby="hero-title" class="px-2 pt-2 sm:px-4 sm:pt-4">
+  <div
+    class="hero-band relative isolate overflow-hidden rounded-[1.75rem] bg-brand text-on-brand sm:rounded-[2.25rem]"
+  >
+    <div
+      class="container-page grid items-center gap-12 pt-14 pb-0 sm:pt-20 lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:py-24"
+    >
+      <div class="max-w-xl">
+        <p
+          class="inline-flex items-center gap-2 rounded-full bg-white/8 px-3 py-1.5 text-xs font-medium ring-1 ring-brand-line"
+        >
+          <span class="size-1.5 rounded-full bg-mint" aria-hidden="true"></span>
+          Free for every store during early access
+        </p>
+
+        <h1
+          id="hero-title"
+          class="mt-6 text-[2.5rem] leading-[1.02] font-extrabold sm:text-6xl lg:text-[4.25rem]"
+        >
+          Shopify invoices &amp; packing slips, <span class="text-mint">on brand and on autopilot</span>
+        </h1>
+
+        <p class="mt-6 max-w-lg text-lg leading-relaxed text-on-brand-muted">
+          Create, print, download and email invoices, receipts, packing slips, refunds and quotes —
+          from the Shopify admin, Shopify POS or your customer's order page.
+        </p>
+
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <ButtonLink href={site.appStoreUrl} external size="lg" icon="arrow-right">
+            Install on Shopify
+          </ButtonLink>
+          <ButtonLink href="/pricing/" variant="on-brand" size="lg">View pricing</ButtonLink>
+        </div>
+
+        <ul class="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-on-brand-muted">
+          {
+            proofPoints.map((point) => (
+              <li class="inline-flex items-center gap-1.5">
+                <Icon name="check" size={16} strokeWidth={2.25} class="text-mint" />
+                {point}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Document stack: packing slip behind, invoice in front, receipt chips on top. -->
+      <!-- On small screens the stack runs off the bottom of the band on purpose. -->
+      <div
+        class="relative mx-auto -mb-28 w-full max-w-[26rem] sm:-mb-40 lg:mb-0 lg:max-w-[28rem]"
+        aria-hidden="true"
+      >
+        <div
+          class="doc-frame absolute top-6 -right-2 w-[82%] rotate-[5deg] opacity-90 sm:-right-10"
+        >
+          <Picture
+            src={getScreenshot('packing-slip')}
+            formats={['avif', 'webp']}
+            widths={[320, 480, 640]}
+            sizes="(min-width: 1024px) 380px, 70vw"
+            alt=""
+            loading="lazy"
+            class="h-auto w-full"
+          />
+        </div>
+        <!-- drop-shadow (not box-shadow) so the shadow follows the torn edge mask -->
+        <div class="relative w-[88%] -rotate-[1.5deg] drop-shadow-[0_28px_40px_rgb(0_0_0/0.45)]">
+          <div class="doc-frame edge-torn">
+          <Picture
+            src={getScreenshot('invoice')}
+            formats={['avif', 'webp']}
+            widths={[360, 540, 720, 900]}
+            sizes="(min-width: 1024px) 420px, 80vw"
+            alt=""
+            loading="eager"
+            fetchpriority="high"
+            class="h-auto w-full"
+          />
+          </div>
+        </div>
+
+        <div
+          class="absolute top-[18%] -left-3 hidden items-center gap-3 rounded-2xl bg-surface px-4 py-3 text-fg shadow-float sm:flex"
+        >
+          <span class="grid size-9 place-items-center rounded-xl bg-mint text-on-mint">
+            <Icon name="mail" size={18} strokeWidth={2} />
+          </span>
+          <span class="text-sm leading-tight">
+            <span class="block font-semibold">Invoice #1117 sent</span>
+            <span class="text-muted">PDF attached · Order paid</span>
+          </span>
+        </div>
+        <div
+          class="absolute right-0 bottom-[22%] hidden items-center gap-3 rounded-2xl bg-surface px-4 py-3 text-fg shadow-float sm:flex lg:-right-6"
+        >
+          <span class="grid size-9 place-items-center rounded-xl bg-brand text-mint">
+            <Icon name="printer" size={18} strokeWidth={2} />
+          </span>
+          <span class="text-sm leading-tight">
+            <span class="block font-semibold">250 orders → 1 PDF</span>
+            <span class="text-muted">Bulk print, one job</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Faint dot grid + mint glow behind the hero content. */
+  .hero-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(60rem 30rem at 85% 10%, rgb(44 217 127 / 0.16), transparent 60%),
+      radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.07) 1px, transparent 0) 0 0 / 22px 22px;
+  }
+</style>
