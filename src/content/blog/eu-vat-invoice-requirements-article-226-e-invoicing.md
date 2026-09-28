@@ -1,15 +1,21 @@
 ---
-title: 'EU VAT invoice requirements: Article 226 fields and the move to e-invoicing'
-description: 'The mandatory VAT invoice fields under Article 226 of the EU VAT Directive, simplified invoices, and what e-invoicing, Peppol and ViDA mean for Shopify merchants.'
+title: "EU VAT invoice requirements: Article 226 fields and the move to
+  e-invoicing XXX"
+description: The mandatory VAT invoice fields under Article 226 of the EU VAT
+  Directive, simplified invoices, and what e-invoicing, Peppol and ViDA mean for
+  Shopify merchants.
 pubDate: 2026-09-24
-author: 'EZ Order team'
-tags: ['EU VAT', 'Compliance', 'E-invoicing']
+updatedDate: 2026-09-28
+author: EZ Order team
+tags:
+  - EU VAT
+  - Compliance
+  - E-invoicing
 cover:
-  src: '../../assets/uploads/cover-eu-vat-invoice-requirements.webp'
-  alt: 'A German-language VAT invoice with a euro totals breakdown'
+  src: ../../assets/uploads/cover-eu-vat-invoice-requirements.webp
+  alt: A German-language VAT invoice with a euro totals breakdown
 draft: false
 ---
-
 If you sell to customers in the European Union, your invoices are legal documents. The EU VAT Directive (Council Directive 2006/112/EC) sets out what a VAT invoice must contain, and member states are now moving from PDF invoices to structured electronic invoices exchanged over networks such as Peppol.
 
 This article explains the mandatory fields under **Article 226**, when a simplified invoice is allowed, and how the e-invoicing wave affects Shopify stores.
@@ -77,13 +83,15 @@ EZ Order Printer templates include blocks for your tax number, registration numb
 
 An **e-invoice** in the regulatory sense is not a PDF. It is a structured file — typically **UBL** or **CII** XML following the European standard **EN 16931** — that the buyer's system can process automatically. Several countries now require this format for business-to-business sales:
 
+
 | Country | What applies |
-|---|---|
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | Italy | Mandatory e-invoicing through the national SDI platform since 2019 |
 | Germany | All businesses must be able to receive e-invoices since January 2025; issuing becomes mandatory in phases from 2027 |
 | Belgium | Structured B2B e-invoices via Peppol mandatory since January 2026 |
 | Poland | National KSeF platform mandatory in phases from February 2026 |
 | France | From September 2026 all businesses must be able to receive e-invoices; large and mid-sized companies must issue them, smaller ones from 2027 |
+
 
 Timelines move, so treat this table as a snapshot (September 2026) and check your country's latest guidance.
 
