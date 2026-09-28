@@ -1,0 +1,177 @@
+---
+/**
+ * Blog article layout: breadcrumb, meta, cover, table of contents, prose body,
+ * tags, related posts and an install CTA. Emits BlogPosting + BreadcrumbList JSON-LD.
+ * Only the article body carries `data-pagefind-body`, so search indexes posts only.
+ */
+import type { MarkdownHeading } from 'astro';
+import { Picture, getImage } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+import ButtonLink from '../components/ui/ButtonLink.astro';
+import TableOfContents from '../components/blog/TableOfContents.astro';
+import PostCard from '../components/blog/PostCard.astro';
+import { site } from '../data/site';
+import { formatDate, postUrl, readingTime, tagUrl, type BlogPost } from '../lib/blog-posts';
+import { blogPostingSchema, breadcrumbSchema } from '../lib/json-ld-schema-builders';
+
+interface Props {
+  post: BlogPost;
+  headings: MarkdownHeading[];
+  related: BlogPost[];
+}
+
+const { post, headings, related } = Astro.props;
+const { title, description, pubDate, updatedDate, author, tags, cover } = post.data;
+const path = postUrl(post);
+const minutes = readingTime(post.body);
+
+// Social card: the cover resized to 1200×630 JPEG; site default otherwise.
+const ogImage = cover
+  ? (await getImage({ src: cover.src, width: 1200, height: 630, fit: 'cover', format: 'jpg' })).src
+  : '/og-default.jpg';
+
+const jsonLd = [
+  blogPostingSchema({ title, description, path, image: ogImage, author, pubDate, updatedDate, tags }),
+  breadcrumbSchema([
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog/' },
+    { name: title, path },
+  ]),
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={ogImage}
+  imageAlt={cover?.alt ?? title}
+  type="article"
+  publishedTime={pubDate}
+  modifiedTime={updatedDate}
+  tags={tags}
+  jsonLd={jsonLd}
+>
+  <article class="container-page pt-10 sm:pt-14">
+    <nav aria-label="Breadcrumb" class="text-sm text-muted">
+      <ol class="flex flex-wrap items-center gap-1.5">
+        <li><a href="/" class="hover:text-fg">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a href="/blog/" class="hover:text-fg">Blog</a></li>
+        <li aria-hidden="true">/</li>
+        <li><span aria-current="page" class="line-clamp-1 text-fg">{title}</span></li>
+      </ol>
+    </nav>
+
+    <header class="mt-8 max-w-3xl">
+      {
+        tags.length > 0 && (
+          <ul class="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <li>
+                <a href={tagUrl(tag)} class="eyebrow rounded-full bg-mint-soft px-2.5 py-1 hover:underline">
+                  {tag}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      <h1 class="mt-5 text-4xl leading-[1.08] font-extrabold sm:text-5xl">{title}</h1>
+      <p class="mt-5 text-xl leading-relaxed text-muted">{description}</p>
+      <p class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
+        <span>By <span class="font-semibold text-fg">{author}</span></span>
+        <span class="inline-flex items-center gap-1.5">
+          <Icon name="calendar" size={15} />
+          <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+        </span>
+        {
+          updatedDate && (
+            <span>
+              Updated <time datetime={updatedDate.toISOString()}>{formatDate(updatedDate)}</time>
+            </span>
+          )
+        }
+        <span class="inline-flex items-center gap-1.5">
+          <Icon name="clock" size={15} />
+          {minutes} min read
+        </span>
+      </p>
+    </header>
+
+    {
+      cover && (
+        <div class="mt-10 aspect-[1200/630] overflow-hidden rounded-(--radius-card) border border-line bg-surface-muted">
+          <Picture
+            src={cover.src}
+            formats={['avif', 'webp']}
+            widths={[640, 960, 1280, 1600]}
+            sizes="(min-width: 1152px) 1088px, 94vw"
+            alt={cover.alt}
+            loading="eager"
+            fetchpriority="high"
+            class="h-full w-full object-cover"
+          />
+        </div>
+      )
+    }
+
+    <div class="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-16">
+      <!-- Mobile: collapsible table of contents above the article -->
+      <details class="rounded-2xl border border-line bg-surface p-5 lg:hidden">
+        <summary class="cursor-pointer text-sm font-semibold">Table of contents</summary>
+        <div class="mt-4"><TableOfContents headings={headings} /></div>
+      </details>
+
+      <div
+        class="prose prose-lg max-w-none min-w-0 prose-headings:scroll-mt-24 prose-headings:font-display prose-h2:mt-12 prose-a:underline-offset-4 prose-img:rounded-xl"
+        data-pagefind-body
+      >
+        <slot />
+      </div>
+
+      <aside class="hidden lg:block">
+        <div class="sticky top-24"><TableOfContents headings={headings} /></div>
+      </aside>
+    </div>
+
+    <footer class="mt-14 max-w-3xl border-t border-line pt-8">
+      {
+        tags.length > 0 && (
+          <p class="flex flex-wrap items-center gap-2 text-sm">
+            <Icon name="tag" size={16} class="text-muted" />
+            <span class="sr-only">Tags:</span>
+            {tags.map((tag) => (
+              <a href={tagUrl(tag)} class="rounded-full border border-line px-3 py-1 hover:border-line-strong">
+                {tag}
+              </a>
+            ))}
+          </p>
+        )
+      }
+
+      <div class="mt-10 flex flex-col gap-5 rounded-(--radius-card) bg-brand p-7 text-on-brand sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="font-display text-xl font-bold">Try EZ Order Printer free</p>
+          <p class="mt-1 text-sm text-on-brand-muted">Branded invoices, packing slips and PDF emails for Shopify.</p>
+        </div>
+        <ButtonLink href={site.appStoreUrl} external icon="arrow-right" class="shrink-0">Install on Shopify</ButtonLink>
+      </div>
+    </footer>
+  </article>
+
+  {
+    related.length > 0 && (
+      <section aria-labelledby="related-title" class="container-page mt-20">
+        <h2 id="related-title" class="text-2xl font-bold">Keep reading</h2>
+        <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {related.map((item) => (
+            <li class="flex">
+              <PostCard post={item} headingLevel="h3" />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</BaseLayout>

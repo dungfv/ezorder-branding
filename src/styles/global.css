@@ -190,3 +190,9 @@
   --tw-prose-th-borders: var(--c-line-strong);
   --tw-prose-td-borders: var(--c-line);
 }
+
+/* Blockquotes are used for notes/disclaimers, not quotations: no curly quote marks. */
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+  content: none;
+}

@@ -1,0 +1,73 @@
+---
+/**
+ * Prev/next + numbered pagination for paginate() routes.
+ * `baseUrl` is the first page (e.g. "/blog/"); page N lives at `${baseUrl}N/`.
+ */
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  currentPage: number;
+  lastPage: number;
+  baseUrl: string;
+}
+
+const { currentPage, lastPage, baseUrl } = Astro.props;
+const pageUrl = (n: number) => (n === 1 ? baseUrl : `${baseUrl}${n}/`);
+
+// Compact window: first, last, current ±1, with gaps shown as "…".
+const pages: (number | 'gap')[] = [];
+for (let n = 1; n <= lastPage; n++) {
+  if (n === 1 || n === lastPage || Math.abs(n - currentPage) <= 1) pages.push(n);
+  else if (pages.at(-1) !== 'gap') pages.push('gap');
+}
+
+const linkBase =
+  'inline-flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-semibold transition-colors';
+---
+
+{
+  lastPage > 1 && (
+    <nav aria-label="Pagination" class="mt-14 flex items-center justify-between gap-4">
+      {currentPage > 1 ? (
+        <a href={pageUrl(currentPage - 1)} rel="prev" class={`${linkBase} ring-1 ring-line-strong hover:ring-fg/40`}>
+          <Icon name="arrow-left" size={16} strokeWidth={2} />
+          <span class="hidden sm:inline">Newer</span>
+          <span class="sr-only sm:hidden">Previous page</span>
+        </a>
+      ) : (
+        <span />
+      )}
+
+      <ol class="flex items-center gap-1">
+        {pages.map((n) =>
+          n === 'gap' ? (
+            <li class="px-1 text-muted" aria-hidden="true">
+              …
+            </li>
+          ) : (
+            <li>
+              <a
+                href={pageUrl(n)}
+                class:list={[linkBase, n === currentPage ? 'bg-brand text-on-brand' : 'text-muted hover:text-fg']}
+                aria-current={n === currentPage ? 'page' : undefined}
+                aria-label={`Page ${n}`}
+              >
+                {n}
+              </a>
+            </li>
+          ),
+        )}
+      </ol>
+
+      {currentPage < lastPage ? (
+        <a href={pageUrl(currentPage + 1)} rel="next" class={`${linkBase} ring-1 ring-line-strong hover:ring-fg/40`}>
+          <span class="hidden sm:inline">Older</span>
+          <span class="sr-only sm:hidden">Next page</span>
+          <Icon name="arrow-right" size={16} strokeWidth={2} />
+        </a>
+      ) : (
+        <span />
+      )}
+    </nav>
+  )
+}

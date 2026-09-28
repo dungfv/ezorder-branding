@@ -1,0 +1,51 @@
+---
+/** Posts for one tag, paginated: /blog/tag/<tag>/, /blog/tag/<tag>/2/ … */
+import type { GetStaticPaths, Page } from 'astro';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import BlogListingView from '../../../../components/blog/BlogListingView.astro';
+import { getAllTags, getPublishedPosts, POSTS_PER_PAGE, slugifyTag, type BlogPost } from '../../../../lib/blog-posts';
+import { breadcrumbSchema } from '../../../../lib/json-ld-schema-builders';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getPublishedPosts();
+  const tags = getAllTags(posts);
+  return tags.flatMap((tag) =>
+    paginate(
+      posts.filter((post) => post.data.tags.some((name) => slugifyTag(name) === tag.slug)),
+      { params: { tag: tag.slug }, props: { tag, tags }, pageSize: POSTS_PER_PAGE },
+    ),
+  );
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<BlogPost>;
+  tag: { name: string; slug: string; count: number };
+  tags: ReturnType<typeof getAllTags>;
+}
+
+const { page, tag, tags } = Astro.props;
+const baseUrl = `/blog/tag/${tag.slug}/`;
+const title = page.currentPage > 1 ? `${tag.name} – Page ${page.currentPage}` : `${tag.name} articles`;
+---
+
+<BaseLayout
+  title={title}
+  description={`Articles about ${tag.name.toLowerCase()} for Shopify merchants, from the EZ Order Printer blog.`}
+  jsonLd={[
+    breadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog/' },
+      { name: tag.name, path: baseUrl },
+    ]),
+  ]}
+>
+  <BlogListingView
+    page={page}
+    title={tag.name}
+    eyebrow="Topic"
+    lead={`${tag.count} article${tag.count === 1 ? '' : 's'} tagged “${tag.name}”.`}
+    baseUrl={baseUrl}
+    tags={tags}
+    activeTagSlug={tag.slug}
+  />
+</BaseLayout>

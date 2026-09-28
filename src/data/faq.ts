@@ -21,7 +21,7 @@ export const homeFaq: FaqItem[] = [
   {
     question: 'Does it work with Shopify POS?',
     answer:
-      'Yes. EZ Order Printer adds a print action to Shopify POS, so staff can print a receipt or packing slip, or download the PDF, right at the counter.',
+      'Yes. EZ Order Printer adds a “Print with EZ Order Printer” action to the order screen in Shopify POS, so staff can print an invoice or receipt, packing slip, refund or return slip right at the counter.',
   },
   {
     question: 'Can invoices be emailed automatically?',

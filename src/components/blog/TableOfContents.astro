@@ -1,0 +1,32 @@
+---
+/** Table of contents from rendered headings (h2 + h3). */
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const items = Astro.props.headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  items.length > 1 && (
+    <nav aria-labelledby="toc-title">
+      <p id="toc-title" class="font-mono text-xs font-medium tracking-[0.14em] text-muted uppercase">
+        On this page
+      </p>
+      <ol class="mt-4 space-y-2 border-l border-line text-sm">
+        {items.map((heading) => (
+          <li class:list={[heading.depth === 3 ? 'pl-7' : 'pl-4']}>
+            <a
+              href={`#${heading.slug}`}
+              class="-ml-px block border-l border-transparent pl-0 leading-snug text-muted transition-colors hover:text-fg"
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}

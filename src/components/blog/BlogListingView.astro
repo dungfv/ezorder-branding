@@ -1,0 +1,79 @@
+---
+/**
+ * Shared body for paginated listings: /blog/[...page] and /blog/tag/[tag]/[...page].
+ * Renders header, search, tag filter, post grid and pagination.
+ */
+import type { Page } from 'astro';
+import PageHeader from '../ui/PageHeader.astro';
+import Icon from '../ui/Icon.astro';
+import PostCard from './PostCard.astro';
+import PaginationNav from './PaginationNav.astro';
+import BlogSearch from './BlogSearch.astro';
+import type { BlogPost } from '../../lib/blog-posts';
+
+interface Props {
+  page: Page<BlogPost>;
+  title: string;
+  lead: string;
+  eyebrow: string;
+  baseUrl: string;
+  tags: { name: string; slug: string; count: number }[];
+  activeTagSlug?: string;
+}
+
+const { page, title, lead, eyebrow, baseUrl, tags, activeTagSlug } = Astro.props;
+const chip = 'inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm transition-colors';
+---
+
+<PageHeader eyebrow={eyebrow} title={page.currentPage > 1 ? `${title} – Page ${page.currentPage}` : title} lead={lead}>
+  <div class="mx-auto mt-8 max-w-xl text-left">
+    <BlogSearch />
+  </div>
+</PageHeader>
+
+<div class="container-page mt-10">
+  <nav aria-label="Topics" class="flex flex-wrap items-center justify-center gap-2">
+    <a
+      href="/blog/"
+      class:list={[chip, !activeTagSlug ? 'border-brand bg-brand text-on-brand' : 'border-line hover:border-line-strong']}
+      aria-current={!activeTagSlug ? 'page' : undefined}
+    >
+      All posts
+    </a>
+    {
+      tags.map((tag) => (
+        <a
+          href={`/blog/tag/${tag.slug}/`}
+          class:list={[chip, activeTagSlug === tag.slug ? 'border-brand bg-brand text-on-brand' : 'border-line hover:border-line-strong']}
+          aria-current={activeTagSlug === tag.slug ? 'page' : undefined}
+        >
+          {tag.name}
+          <span class="ml-1.5 text-xs opacity-70">{tag.count}</span>
+        </a>
+      ))
+    }
+  </nav>
+
+  {
+    page.data.length > 0 ? (
+      <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {page.data.map((post) => (
+          <li class="flex">
+            <PostCard post={post} />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="mt-16 text-center text-muted">No posts yet — check back soon.</p>
+    )
+  }
+
+  <PaginationNav currentPage={page.currentPage} lastPage={page.lastPage} baseUrl={baseUrl} />
+
+  <p class="mt-14 text-center text-sm text-muted">
+    <a href="/rss.xml" class="inline-flex items-center gap-1.5 hover:text-fg">
+      <Icon name="rss" size={15} />
+      Subscribe via RSS
+    </a>
+  </p>
+</div>

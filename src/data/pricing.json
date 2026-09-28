@@ -23,7 +23,7 @@
         "Print, download as PDF and bulk print in one job",
         "Email documents with the PDF attached, manually or automatically",
         "Documents in 30+ languages and the currency your customer paid in",
-        "Print from the Shopify admin, Shopify POS and the customer's order page"
+        "Print from the Shopify admin and Shopify POS; customers download from their order page"
       ]
     }
   ],
@@ -47,7 +47,7 @@
         { "feature": "Print from the order page in Shopify admin", "values": ["yes"] },
         { "feature": "Download as PDF", "values": ["yes"] },
         { "feature": "Bulk print & download from the orders list", "values": ["yes"] },
-        { "feature": "Print and download in Shopify POS", "values": ["yes"] }
+        { "feature": "Print from Shopify POS", "values": ["yes"] }
       ]
     },
     {

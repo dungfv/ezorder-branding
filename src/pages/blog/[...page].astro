@@ -1,0 +1,39 @@
+---
+/**
+ * Blog index, paginated: page 1 at /blog/, then /blog/2/, /blog/3/ …
+ * Each page has its own canonical URL and a "Blog – Page N" title.
+ */
+import type { GetStaticPaths, Page } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogListingView from '../../components/blog/BlogListingView.astro';
+import { getAllTags, getPublishedPosts, POSTS_PER_PAGE, type BlogPost } from '../../lib/blog-posts';
+import { breadcrumbSchema } from '../../lib/json-ld-schema-builders';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = await getPublishedPosts();
+  return paginate(posts, { pageSize: POSTS_PER_PAGE, props: { tags: getAllTags(posts) } });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<BlogPost>;
+  tags: ReturnType<typeof getAllTags>;
+}
+
+const { page, tags } = Astro.props;
+const title = page.currentPage > 1 ? `Blog – Page ${page.currentPage}` : 'Blog';
+---
+
+<BaseLayout
+  title={title}
+  description="Guides on Shopify invoices, packing slips, POS receipts, email automation and EU invoicing rules from the EZ Order Printer team."
+  jsonLd={[breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Blog', path: '/blog/' }])]}
+>
+  <BlogListingView
+    page={page}
+    title="Blog"
+    eyebrow="Resources"
+    lead="Practical guides on Shopify invoicing, packing slips, POS and compliance."
+    baseUrl="/blog/"
+    tags={tags}
+  />
+</BaseLayout>

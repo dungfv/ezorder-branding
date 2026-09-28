@@ -57,7 +57,7 @@ export const features: Feature[] = [
   {
     icon: 'pos',
     title: 'Shopify POS ready',
-    body: 'At the counter, pull up the order in Shopify POS and print the receipt or packing slip, or download the PDF before the customer leaves.',
+    body: 'At the counter, open the order in Shopify POS, tap “Print with EZ Order Printer” and hand over a branded receipt, packing slip or refund note.',
   },
   {
     icon: 'landmark',

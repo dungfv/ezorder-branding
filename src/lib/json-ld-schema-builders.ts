@@ -60,7 +60,7 @@ export function softwareApplicationSchema(plans: PricingPlan[], currency: string
     url: site.url,
     installUrl: site.appStoreUrl,
     description: site.description,
-    image: absoluteUrl('/og-default.png'),
+    image: absoluteUrl('/og-default.jpg'),
     publisher: { '@id': ORG_ID },
     offers: plans.map((plan) => offerSchema(plan, currency)),
   };
@@ -87,7 +87,7 @@ export function pricingOffersSchema(plans: PricingPlan[], currency: string): Jso
     name: site.name,
     description: site.description,
     brand: { '@type': 'Brand', name: site.companyName },
-    image: absoluteUrl('/og-default.png'),
+    image: absoluteUrl('/og-default.jpg'),
     offers: {
       '@type': 'AggregateOffer',
       priceCurrency: currency,
