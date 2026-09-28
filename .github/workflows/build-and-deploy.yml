@@ -6,7 +6,7 @@
 #   AWS_REGION, AWS_DEPLOY_ROLE_ARN, S3_BUCKET, CLOUDFRONT_DISTRIBUTION_ID
 # Only a job that declares `environment: production` can read them. That also changes
 # the OIDC subject to repo:<owner>/<repo>:environment:production, which the IAM role's
-# trust policy must match.
+# trust policy must match
 name: Build and deploy
 
 on:
