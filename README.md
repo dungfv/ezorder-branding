@@ -134,6 +134,8 @@ Editor ─► Pages CMS ─► commit to GitHub (main)
 
 One-time setup, in this order. Nothing touches the live domain until step 7.
 
+**Doing it by hand in the AWS console?** Follow the step-by-step guide (Vietnamese) in [`docs/deploy-aws-console/`](docs/deploy-aws-console/README.md). It is the manual equivalent of the CloudFormation stack in step 3, plus GitHub, Pages CMS, DNS cutover and troubleshooting. Use one approach, not both.
+
 ### 1. GitHub repository
 
 1. Create a repository (private is fine), e.g. `uppush/ezorder-website`, then push:
