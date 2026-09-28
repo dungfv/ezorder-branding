@@ -1,0 +1,84 @@
+# Every push and PR: type-check + build (catches content that would break the site,
+# e.g. a Pages CMS edit on a branch). Pushes to main: also deploy to S3 + CloudFront.
+#
+# Repository variables (Settings → Secrets and variables → Actions → Variables),
+# values come from the CloudFormation stack outputs (infra/cloudformation-website-hosting.yml):
+#   AWS_REGION, AWS_DEPLOY_ROLE_ARN, S3_BUCKET, CLOUDFRONT_DISTRIBUTION_ID
+name: Build and deploy
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        with:
+          name: site
+          path: dist
+          retention-days: 7
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # Never run two deploys at once; a newer push waits for the current one.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write # OIDC token for AWS, no stored access keys
+    env:
+      BUCKET: ${{ vars.S3_BUCKET }}
+      IMMUTABLE: public,max-age=31536000,immutable
+      # Browsers revalidate every time; CloudFront keeps it until the invalidation below.
+      REVALIDATE: public,max-age=0,s-maxage=31536000,must-revalidate
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Upload fingerprinted assets first (new HTML never points at a missing file)
+        run: |
+          aws s3 sync dist/_astro "s3://$BUCKET/_astro" --cache-control "$IMMUTABLE" \
+            --exclude "*.avif" --exclude "*.woff2"
+          # Explicit types: the CLI's MIME table may not know these extensions.
+          aws s3 sync dist/_astro "s3://$BUCKET/_astro" --cache-control "$IMMUTABLE" \
+            --exclude "*" --include "*.avif" --content-type image/avif
+          aws s3 sync dist/_astro "s3://$BUCKET/_astro" --cache-control "$IMMUTABLE" \
+            --exclude "*" --include "*.woff2" --content-type font/woff2
+
+      - name: Upload pages, feeds and search index; remove deleted pages
+        # Old /_astro files are kept on purpose so pages cached in browsers keep working.
+        run: |
+          aws s3 sync dist "s3://$BUCKET" --delete --exclude "_astro/*" --cache-control "$REVALIDATE" \
+            --exclude "*.wasm"
+          aws s3 sync dist "s3://$BUCKET" --exclude "*" --include "*.wasm" \
+            --content-type application/wasm --cache-control "$REVALIDATE"
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" --paths "/*"

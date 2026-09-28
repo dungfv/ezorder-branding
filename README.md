@@ -9,7 +9,7 @@ Marketing site for **EZ Order Printer PDF Invoice**, the Shopify app for branded
 | Content | Astro Content Collections (Markdown/MDX) |
 | CMS | [Pages CMS](https://app.pagescms.org) via `.pages.yml` |
 | Search | Pagefind (indexed at build time, runs in the browser) |
-| Hosting | Cloudflare Pages (Git integration) |
+| Hosting | AWS S3 (private) + CloudFront, deployed by GitHub Actions (OIDC) |
 | Client JS | None by default. Tiny inline scripts only: mobile-menu close, contact form mailto, blog search |
 
 ---
@@ -26,19 +26,16 @@ npm run build     # astro build + pagefind index → dist/
 npm run preview   # serve dist/ locally (search works here)
 ```
 
-To reproduce Cloudflare behaviour locally (headers, redirects, trailing slashes):
-
-```bash
-npm run build && npx wrangler pages dev ./dist
-```
+`npm run preview` does not apply the CloudFront URL rewrite or security headers; those live in `infra/cloudformation-website-hosting.yml`.
 
 ## Project structure
 
 ```
 .pages.yml                 Pages CMS config (blog, pricing, site settings)
+.github/workflows/        build on every push/PR, deploy main to S3 + CloudFront
+infra/                     CloudFormation: S3, CloudFront (URL rewrite, headers), GitHub OIDC role
 astro.config.mjs           site URL, i18n, sitemap, self-hosted fonts
 public/
-  _headers                 Cloudflare cache + security headers (CSP, HSTS…)
   robots.txt, favicons, og-default.jpg, logo-512.png
 src/
   assets/docs/             Real document renders from the app (hero, galleries)
@@ -113,7 +110,7 @@ Body in Markdown. Use ## and ### headings — they build the table of contents.
 1. Push this repo to GitHub.
 2. Go to [app.pagescms.org](https://app.pagescms.org), sign in with GitHub and install the Pages CMS GitHub App on this repository.
 3. Open the repo in Pages CMS; it reads `.pages.yml` and shows **Blog**, **Pricing** and **Site settings**.
-4. Every save is a commit to the selected branch → Cloudflare Pages rebuilds and deploys automatically. Edit on a branch to get a preview URL before merging to `main`.
+4. Every save is a commit to the selected branch. On `main`, GitHub Actions builds and deploys it (about 3 minutes). On any other branch the workflow only builds, which is a safe way to check an edit before merging.
 
 **Media choice:** uploads go to `src/assets/uploads` (not `public/`), and are written into frontmatter as `../../assets/uploads/<file>` (relative to the post). That keeps them compatible with `astro:assets`, so covers are converted to AVIF/WebP, resized per screen and lazy-loaded. Images in `public/` would be served unoptimised.
 
@@ -123,18 +120,106 @@ If you add a field to the blog schema, update both `src/content.config.ts` and `
 
 **Trust:** Markdown allows raw HTML and the CSP permits inline scripts, so give CMS access only to trusted editors. JSON-LD output is escaped so CMS text can't break out of its `<script>`. A stricter hash-based CSP (Astro's `security.csp`) is a possible follow-up once the inline scripts are moved to bundled scripts.
 
-## Deploy to Cloudflare Pages
+## Deploy: GitHub + AWS S3/CloudFront
 
-1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → choose the GitHub repo.
-2. Build settings:
-   - Framework preset: **Astro**
-   - Build command: `npm run build` (runs `astro build` then `pagefind --site dist`)
-   - Build output directory: `dist`
-   - Environment variable: `NODE_VERSION` = `22`
-3. Production branch: `main`. Every other branch and every pull request gets its own preview URL automatically.
-4. Add the custom domain `ezorder.io` (and redirect `www` to it) under **Custom domains**.
+```
+Editor ─► Pages CMS ─► commit to GitHub (main)
+                              │
+               GitHub Actions: npm ci → check → build
+                              │  OIDC → IAM role (no stored AWS keys)
+               aws s3 sync ───┴──► CloudFront invalidation
+                                            │
+       Route 53 ALIAS (ezorder.io, www) ──► CloudFront ──► S3 bucket (private, OAC)
+```
 
-`public/_headers` sets long-term immutable caching for fingerprinted `/_astro/*` files, a short cache for the Pagefind index, and security headers (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `nosniff`). If you add a third-party script or form provider, extend the CSP there. The app's email-verification screen links to `https://ezorder.io/faq/`, which is a real page on this site — keep that URL.
+One-time setup, in this order. Nothing touches the live domain until step 7.
+
+### 1. GitHub repository
+
+1. Create a repository (private is fine), e.g. `uppush/ezorder-website`, then push:
+   ```bash
+   git remote add origin git@github.com:<owner>/<repo>.git
+   git push -u origin main
+   ```
+2. Keep `main` writable for editors: do **not** require pull requests on `main`, or Pages CMS saves will be rejected. Protect against force-pushes and deletion only.
+3. The **Build and deploy** workflow runs on the push; the build job passes, the deploy job fails until step 4. That is expected.
+
+### 2. TLS certificate (ACM, region us-east-1)
+
+1. AWS console → Certificate Manager → switch region to **N. Virginia (us-east-1)** (CloudFront only accepts certificates from there).
+2. Request a public certificate for `ezorder.io` **and** `www.ezorder.io`, DNS validation.
+3. Add the two validation CNAME records where DNS lives **today** (GoDaddy). Keep these records forever: renewal uses them, so they must also be copied to Route 53 in step 7.
+4. Wait for status **Issued**, copy the certificate ARN.
+
+### 3. CloudFormation stack
+
+AWS console → CloudFormation → Create stack → upload `infra/cloudformation-website-hosting.yml` (any region, e.g. the app's `us-west-1`). Parameters:
+
+| Parameter | Value |
+|---|---|
+| `DomainName` | `ezorder.io` |
+| `AcmCertificateArn` | ARN from step 2 |
+| `GitHubRepository` | `<owner>/<repo>` from step 1 |
+| `DeployBranch` | `main` |
+| `ExistingGitHubOidcProviderArn` | empty, **unless** the account already has an IAM identity provider for `token.actions.githubusercontent.com` (IAM → Identity providers); then paste its ARN |
+
+Acknowledge IAM resource creation and create. The stack builds: a private S3 bucket, CloudFront with Origin Access Control, a CloudFront Function (`www` → apex, `/about` → `/about/`, `/about/` → `index.html`), a response-headers policy (CSP, HSTS, `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`), 403/404 → `/404.html`, and an IAM role only `main` of your repo can assume. CLI alternative:
+
+```bash
+aws cloudformation deploy --stack-name ezorder-website \
+  --template-file infra/cloudformation-website-hosting.yml --capabilities CAPABILITY_IAM \
+  --parameter-overrides AcmCertificateArn=<arn> GitHubRepository=<owner>/<repo>
+```
+
+### 4. GitHub Actions variables
+
+Repository → Settings → Secrets and variables → Actions → **Variables** (not secrets; none of these are sensitive):
+
+| Variable | Value |
+|---|---|
+| `AWS_REGION` | region of the stack |
+| `AWS_DEPLOY_ROLE_ARN` | stack output `DeployRoleArn` |
+| `S3_BUCKET` | stack output `BucketName` |
+| `CLOUDFRONT_DISTRIBUTION_ID` | stack output `DistributionId` |
+
+Then Actions → **Build and deploy** → Run workflow (branch `main`).
+
+The deploy uploads `/_astro/*` first with `Cache-Control: immutable` (1 year), then pages/RSS/sitemap/search index with `max-age=0, s-maxage=1 year`, deletes removed pages, and invalidates `/*`. Browsers always revalidate HTML; CloudFront serves it from cache until the next deploy.
+
+### 5. Test on the CloudFront domain
+
+Open `https://<DistributionDomainName>` (stack output) and check: pages load, `/about` redirects to `/about/`, an unknown URL shows the 404 page with status 404, blog search returns results, and the response carries `content-security-policy` and `strict-transport-security` headers (`curl -I`).
+
+### 6. Pages CMS
+
+1. Go to [app.pagescms.org](https://app.pagescms.org) and sign in with GitHub.
+2. Install the **Pages CMS** GitHub App, granting access to **only this repository**.
+3. Open the repository in Pages CMS. It reads `.pages.yml` and shows **Blog**, **Pricing** and **Site settings**.
+4. Invite editors (Pages CMS collaborators, by email; they don't need a GitHub account).
+5. Do one test on a branch before editors start: in Pages CMS switch to a new branch (e.g. `cms-test`), edit a post, upload a cover image, save. The workflow builds that branch; if it's green, merge on GitHub and delete the branch.
+
+### 7. DNS cutover (GoDaddy → Route 53)
+
+CloudFront needs an ALIAS at the apex, which GoDaddy DNS cannot do, so the zone moves to Route 53. The domain stays registered at GoDaddy; only the nameservers change. **Current records to preserve (Sep 2026):** `app` (CNAME → AWS load balancer of the app), `cdn` and `docs` (CloudFront), MX + SPF (GoDaddy email), `_dmarc`, and every `_…` validation CNAME (ACM for this site and for the app/CDN certificates).
+
+1. GoDaddy → DNS → **Export zone file**. If DNSSEC is on, turn it off first.
+2. Route 53 → Create hosted zone `ezorder.io` → Import zone file. Check every record from the export is there.
+3. Replace the imported apex and `www` records with **A + AAAA ALIAS** records to the CloudFront distribution (for both `ezorder.io` and `www.ezorder.io`).
+4. Merge the two `_dmarc` TXT records into one (two DMARC records invalidate DMARC).
+5. A day before switching, lower TTLs at GoDaddy (e.g. 300 s).
+6. GoDaddy → Nameservers → **Custom** → the four Route 53 nameservers of the new zone.
+7. After propagation: `app.ezorder.io` still loads inside Shopify admin, email still arrives, `https://ezorder.io/`, `https://www.ezorder.io/` (redirects) and `https://ezorder.io/faq/` work.
+8. Google Search Console → add `ezorder.io` (DNS TXT in Route 53) → submit `https://ezorder.io/sitemap-index.xml`.
+
+Coordinate with the pending SES setup for `mailer.ezorder.io`: add its DKIM/SPF records in whichever DNS is authoritative at that moment, not in the middle of the switch.
+
+### Operations
+
+- **Publish:** save in Pages CMS or push to `main`; live in ~3 minutes.
+- **Roll back:** revert the commit on `main`, or re-run the deploy job of an earlier successful workflow run (build artifacts are kept 7 days).
+- **Old assets:** `/_astro/*` files are never deleted by deploys (cached pages may still reference them). Clean up occasionally if the bucket grows.
+- **Cost:** S3 + CloudFront + Route 53 for a marketing site is typically a few USD per month (Route 53 zone $0.50). CloudFront invalidations: 1,000 paths/month free; each deploy uses one (`/*`).
+- **Changing security headers / CSP:** edit `SecurityHeadersPolicy` in the template and update the stack (e.g. when adding a form provider or analytics).
 
 ## Contact form
 
@@ -143,9 +228,9 @@ If you add a field to the blog schema, update both `src/content.config.ts` and `
 - **`mailto` (current):** opens the visitor's email client with subject and body pre-filled, addressed to `supportEmail`. Zero backend, but depends on the visitor having a mail client.
 - **Formspree:** create a form, set `provider: 'formspree'` and `endpoint: 'https://formspree.io/f/<id>'`.
 - **Web3Forms:** get an access key, set `provider: 'web3forms'` and `web3formsAccessKey`.
-- **Cloudflare Pages Function:** set `provider: 'pages-function'`, `endpoint: '/api/contact'`, and add `functions/api/contact.ts` that validates the POST body and forwards it to an email API (e.g. Resend or Postmark) using a secret stored in Cloudflare environment variables. Add a Turnstile widget if spam appears.
+- **Own endpoint (AWS):** set `provider: 'endpoint'` and `endpoint` to e.g. a Lambda function URL that validates the POST and sends it with SES. Add that origin to `form-action` in the CloudFront CSP.
 
-Non-mailto providers include a honeypot field. The CSP `form-action` already allows Formspree and Web3Forms.
+Non-mailto providers include a honeypot field. The CSP `form-action` (CloudFront headers policy) already allows Formspree and Web3Forms.
 
 ## SEO
 
@@ -154,7 +239,7 @@ Non-mailto providers include a honeypot field. The CSP `form-action` already all
 - `@astrojs/sitemap` → `/sitemap-index.xml` (404 and the draft `/terms/` excluded; remove the terms filter in `astro.config.mjs` once final), referenced from `robots.txt`. Noindex pages emit no canonical/hreflang.
 - Paginated pages get their own canonical URL and a `Blog – Page N` title.
 - One `h1` per page, landmarks (`header`/`nav`/`main`/`footer`), skip link, `alt` text on every meaningful image.
-- All URLs end with `/` (`trailingSlash: 'always'`), matching how Cloudflare Pages serves `index.html` files.
+- All URLs end with `/` (`trailingSlash: 'always'`), matching how the CloudFront function serves `index.html` files.
 
 ### Adding a language later
 
@@ -173,7 +258,7 @@ Lighthouse 12 on the production build (`npm run build && npm run preview`), 28 S
 | Blog post | 100 / 100 / 100 / 100 — LCP 1.7 s, CLS 0 | 100 / 100 / 100 / 100 |
 | `/faq/` (after review fixes) | 100 / 100 / 100 / 100 | — |
 
-Also verified: no horizontal scroll at 360 px and 768 px on every page in light and dark mode; no console errors with the production CSP (via `wrangler pages dev`); Pagefind search works under the CSP.
+Also verified: no horizontal scroll at 360 px and 768 px on every page in light and dark mode; no console errors with the production CSP (the same policy now set by CloudFront); Pagefind search works under that CSP.
 
 Run it yourself:
 

@@ -10,7 +10,8 @@ const SITE_URL = 'https://ezorder.io';
 export default defineConfig({
   site: SITE_URL,
   output: 'static',
-  // Cloudflare Pages serves `about/index.html` at `/about/`, so every URL ends with a slash.
+  // Pages build to `about/index.html`; the CloudFront function serves them at `/about/`
+  // (and 301s `/about` there), so every URL ends with a slash.
   trailingSlash: 'always',
 
   // English only for now; routing is ready for more locales (no prefix for the default one).
