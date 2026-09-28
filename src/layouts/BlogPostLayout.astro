@@ -104,7 +104,8 @@ const jsonLd = [
         <div class="mt-10 aspect-[1200/630] overflow-hidden rounded-(--radius-card) border border-line bg-surface-muted">
           <Picture
             src={cover.src}
-            formats={['avif', 'webp']}
+            formats={['avif']}
+            fallbackFormat="webp"
             widths={[640, 960, 1280, 1600]}
             sizes="(min-width: 1152px) 1088px, 94vw"
             alt={cover.alt}

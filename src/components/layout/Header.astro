@@ -40,9 +40,10 @@ const isCurrent = (href: string) =>
     </nav>
 
     <div class="flex items-center gap-2">
-      <ButtonLink href={site.appStoreUrl} external class="hidden sm:inline-flex">
-        Install on Shopify
-      </ButtonLink>
+      <!-- Wrapper controls visibility: ButtonLink's own inline-flex would override `hidden`. -->
+      <div class="hidden sm:block">
+        <ButtonLink href={site.appStoreUrl} external>Install on Shopify</ButtonLink>
+      </div>
 
       <details class="group md:hidden" data-mobile-menu>
         <summary

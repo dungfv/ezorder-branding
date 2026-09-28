@@ -41,7 +41,8 @@ const posPoints = [
             <div class="doc-frame translate-y-2 rounded-b-none">
               <Picture
                 src={getScreenshot(key)}
-                formats={['avif', 'webp']}
+                formats={['avif']}
+                fallbackFormat="webp"
                 widths={[320, 480, 720]}
                 sizes="(min-width: 1024px) 330px, 45vw"
                 alt=""
@@ -68,7 +69,8 @@ const posPoints = [
         <div class="doc-frame">
           <Picture
             src={getScreenshot('currency-jpy')}
-            formats={['avif', 'webp']}
+            formats={['avif']}
+            fallbackFormat="webp"
             widths={[320, 480, 760]}
             sizes="(min-width: 1024px) 300px, 90vw"
             alt=""

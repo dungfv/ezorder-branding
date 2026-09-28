@@ -1,0 +1,158 @@
+# Pages CMS configuration — https://pagescms.org/docs/
+# Lets non-developers edit blog posts, pricing and site settings from app.pagescms.org.
+# Keep the blog fields in sync with the schema in src/content.config.ts.
+
+media:
+  # Uploads live under src/assets so astro:assets can optimise them (AVIF/WebP, sizes).
+  input: src/assets/uploads
+  # Written into frontmatter relative to src/content/blog/*.md
+  output: ../../assets/uploads
+
+content:
+  - name: blog
+    label: Blog
+    type: collection
+    path: src/content/blog
+    format: yaml-frontmatter
+    filename: '{primary}.md'
+    view:
+      fields: [title, pubDate, draft]
+      primary: title
+      sort: pubDate
+      order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        description: Shown as the page H1 and in search results (max 120 characters).
+      - name: description
+        label: Description
+        type: text
+        required: true
+        description: Meta description and card summary (max 220 characters).
+      - name: pubDate
+        label: Publish date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: updatedDate
+        label: Updated date
+        type: date
+        options:
+          format: yyyy-MM-dd
+      - name: author
+        label: Author
+        type: string
+        default: EZ Order team
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+      - name: cover
+        label: Cover image
+        type: object
+        description: 1200×630 recommended. Also used as the social sharing image.
+        fields:
+          - name: src
+            label: Image
+            type: image
+          - name: alt
+            label: Alt text
+            type: string
+            description: Describe the image for screen readers.
+      - name: draft
+        label: Draft (hidden from the live site)
+        type: boolean
+        default: false
+      - name: body
+        label: Content
+        type: rich-text
+        options:
+          format: markdown
+
+  - name: pricing
+    label: Pricing
+    type: file
+    path: src/data/pricing.json
+    format: json
+    fields:
+      - name: currency
+        label: Currency (ISO code, e.g. USD)
+        type: string
+        required: true
+      - name: yearlyBilling
+        label: Show Monthly / Yearly toggle
+        type: boolean
+      - name: notice
+        label: Notice banner
+        type: object
+        fields:
+          - { name: enabled, label: Show banner, type: boolean }
+          - { name: label, label: Badge, type: string }
+          - { name: title, label: Title, type: string }
+          - { name: body, label: Text, type: text }
+      - name: plans
+        label: Plans (prices must match the Shopify App Store listing)
+        type: object
+        list: true
+        fields:
+          - { name: id, label: ID (lowercase, no spaces), type: string, required: true }
+          - { name: name, label: Name, type: string, required: true }
+          - { name: tagline, label: Tagline, type: string }
+          - { name: priceMonthly, label: Monthly price, type: number }
+          - { name: priceYearly, label: Monthly price when billed yearly, type: number }
+          - { name: priceNote, label: Note under the price, type: string }
+          - { name: highlight, label: Highlight this plan, type: boolean }
+          - { name: ctaLabel, label: Button label, type: string }
+          - { name: features, label: Key features, type: string, list: true }
+      - name: comparison
+        label: Comparison table
+        type: object
+        list: true
+        fields:
+          - { name: group, label: Group, type: string }
+          - name: rows
+            label: Rows
+            type: object
+            list: true
+            fields:
+              - { name: feature, label: Feature, type: string }
+              - name: values
+                label: Values, one per plan in order ("yes", "no" or short text)
+                type: string
+                list: true
+      - name: faq
+        label: Billing FAQ
+        type: object
+        list: true
+        fields:
+          - { name: question, label: Question, type: string }
+          - { name: answer, label: Answer, type: text }
+
+  - name: site
+    label: Site settings
+    type: file
+    path: src/data/site.json
+    format: json
+    fields:
+      - { name: name, label: Product name, type: string, required: true }
+      - { name: shortName, label: Short name (header, titles), type: string, required: true }
+      - { name: tagline, label: Tagline, type: string }
+      - { name: description, label: Default meta description, type: text }
+      - { name: url, label: Website URL, type: string }
+      - { name: appStoreUrl, label: Shopify App Store URL, type: string }
+      - { name: appUrl, label: App URL, type: string }
+      - { name: docsUrl, label: Documentation URL, type: string }
+      - { name: privacyPolicyUrl, label: App privacy policy URL, type: string }
+      - { name: supportEmail, label: Support email, type: string }
+      - { name: companyName, label: Company name, type: string }
+      - { name: twitterHandle, label: X / Twitter handle (e.g. @ezorder), type: string }
+      - name: social
+        label: Social links (leave URL empty to hide)
+        type: object
+        list: true
+        fields:
+          - { name: label, label: Label, type: string }
+          - { name: url, label: URL, type: string }

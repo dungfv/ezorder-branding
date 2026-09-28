@@ -69,7 +69,8 @@ const proofPoints = ['No credit card', '14 templates', '30+ languages'];
         >
           <Picture
             src={getScreenshot('packing-slip')}
-            formats={['avif', 'webp']}
+            formats={['avif']}
+            fallbackFormat="webp"
             widths={[320, 480, 640]}
             sizes="(min-width: 1024px) 380px, 70vw"
             alt=""
@@ -82,7 +83,8 @@ const proofPoints = ['No credit card', '14 templates', '30+ languages'];
           <div class="doc-frame edge-torn">
           <Picture
             src={getScreenshot('invoice')}
-            formats={['avif', 'webp']}
+            formats={['avif']}
+            fallbackFormat="webp"
             widths={[360, 540, 720, 900]}
             sizes="(min-width: 1024px) 420px, 80vw"
             alt=""

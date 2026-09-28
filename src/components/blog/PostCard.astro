@@ -20,7 +20,8 @@ const Heading = headingLevel;
       <div class="aspect-[1200/630] overflow-hidden border-b border-line bg-surface-muted">
         <Picture
           src={cover.src}
-          formats={['avif', 'webp']}
+          formats={['avif']}
+          fallbackFormat="webp"
           widths={[400, 640, 800]}
           sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 92vw"
           alt={cover.alt}
