@@ -59,6 +59,19 @@ jobs:
           name: site
           path: dist
 
+      # TEMPORARY: print the OIDC claims AWS checks against the role's trust policy
+      # (decoded payload only, never the token itself). Remove once deploys work.
+      - name: Debug OIDC claims (temporary)
+        run: |
+          curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" \
+          | node -e "
+              const { value } = JSON.parse(require('fs').readFileSync(0, 'utf8'));
+              const c = JSON.parse(Buffer.from(value.split('.')[1], 'base64url').toString());
+              console.log(JSON.stringify({ sub: c.sub, aud: c.aud, environment: c.environment,
+                repository: c.repository, ref: c.ref, iss: c.iss }, null, 2));
+            "
+
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
