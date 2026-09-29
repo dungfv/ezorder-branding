@@ -239,6 +239,10 @@ Coordinate with the pending SES setup for `mailer.ezorder.io`: add its DKIM/SPF 
 
 Non-mailto providers include a honeypot field. The CSP `form-action` (CloudFront headers policy) already allows Formspree and Web3Forms.
 
+## Live chat (Crisp)
+
+`src/components/layout/ChatWidget.astro` holds the Crisp embed (website ID inside) and is rendered on every page by `BaseLayout`. The CloudFront CSP allows Crisp's domains (`*.crisp.chat`, `wss://*.relay.crisp.chat`, `*.crisp.help`, per Crisp's CSP guide). To remove the widget, delete `<ChatWidget />` from `BaseLayout`.
+
 ## SEO
 
 - `<SEO>` component on every page: title template (`Page | EZ Order Printer`), description, canonical, `hreflang` + `x-default`, Open Graph, Twitter card, per-post OG image.

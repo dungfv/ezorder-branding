@@ -1,0 +1,19 @@
+---
+/**
+ * Crisp live-chat widget, loaded on every page from BaseLayout.
+ * is:inline keeps Crisp's snippet as a classic script (it relies on globals).
+ * Its domains are allowed in the CloudFront CSP (infra/cloudformation-website-hosting.yml).
+ */
+---
+
+<script is:inline>
+  window.$crisp = [];
+  window.CRISP_WEBSITE_ID = '481ec1eb-32ab-417f-bc00-11c6a40abbcd';
+  (function () {
+    d = document;
+    s = d.createElement('script');
+    s.src = 'https://client.crisp.chat/l.js';
+    s.async = 1;
+    d.getElementsByTagName('head')[0].appendChild(s);
+  })();
+</script>

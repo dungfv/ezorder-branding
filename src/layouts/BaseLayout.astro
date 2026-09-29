@@ -8,6 +8,7 @@ import '../styles/global.css';
 import SEO, { type SeoProps } from '../components/seo/SEO.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
+import ChatWidget from '../components/layout/ChatWidget.astro';
 import { organizationSchema, websiteSchema } from '../lib/json-ld-schema-builders';
 
 type Props = SeoProps;
@@ -49,5 +50,6 @@ const jsonLd = [organizationSchema(), websiteSchema(), ...(props.jsonLd ?? [])];
       <slot />
     </main>
     <Footer />
+    <ChatWidget />
   </body>
 </html>
