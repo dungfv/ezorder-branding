@@ -9,6 +9,7 @@ import SEO, { type SeoProps } from '../components/seo/SEO.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import ChatWidget from '../components/layout/ChatWidget.astro';
+import GoogleAnalytics from '../components/layout/GoogleAnalytics.astro';
 import { organizationSchema, websiteSchema } from '../lib/json-ld-schema-builders';
 
 type Props = SeoProps;
@@ -25,6 +26,7 @@ const jsonLd = [organizationSchema(), websiteSchema(), ...(props.jsonLd ?? [])];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <GoogleAnalytics />
     <meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#06120c" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

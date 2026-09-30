@@ -1,0 +1,25 @@
+---
+/**
+ * Google Analytics 4 tag (gtag.js), loaded on every page from BaseLayout.
+ * Production builds only, so `astro dev` traffic stays out of the reports.
+ * is:inline keeps Google's snippet as classic scripts (gtag must stay a global).
+ * Its domains are allowed in the CloudFront CSP (infra/cloudformation-website-hosting.yml).
+ */
+---
+
+{
+  import.meta.env.PROD && (
+    <>
+      <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-H6Q84LKEN3" />
+      <script is:inline>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-H6Q84LKEN3');
+      </script>
+    </>
+  )
+}

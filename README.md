@@ -243,6 +243,10 @@ Non-mailto providers include a honeypot field. The CSP `form-action` (CloudFront
 
 `src/components/layout/ChatWidget.astro` holds the Crisp embed (website ID inside) and is rendered on every page by `BaseLayout`. The CloudFront CSP allows Crisp's domains (`*.crisp.chat`, `wss://*.relay.crisp.chat`, `*.crisp.help`, per Crisp's CSP guide). To remove the widget, delete `<ChatWidget />` from `BaseLayout`.
 
+## Analytics (Google Analytics 4)
+
+`src/components/layout/GoogleAnalytics.astro` holds the gtag.js snippet (measurement ID inside) and is rendered in the `<head>` of every page by `BaseLayout`, in production builds only. The CloudFront CSP allows Google's domains (`*.googletagmanager.com`, `*.google-analytics.com`, `*.analytics.google.com`, per Google's CSP guide). To remove it, delete `<GoogleAnalytics />` from `BaseLayout`.
+
 ## SEO
 
 - `<SEO>` component on every page: title template (`Page | EZ Order Printer`), description, canonical, `hreflang` + `x-default`, Open Graph, Twitter card, per-post OG image.

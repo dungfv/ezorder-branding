@@ -77,7 +77,7 @@ Thay cho file `_headers` của Cloudflare trước đây.
 | Content-Security-Policy | chuỗi bên dưới (dán thành **một dòng**) |
 
 ```
-default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://*.crisp.chat; style-src 'self' 'unsafe-inline' https://*.crisp.chat; img-src 'self' data: https://*.crisp.chat; font-src 'self' https://*.crisp.chat; media-src 'self' https://*.crisp.chat; connect-src 'self' https://*.crisp.chat wss://*.relay.crisp.chat wss://*.relay.rescue.crisp.chat; frame-src 'self' https://*.crisp.chat https://*.crisp.help; worker-src 'self' blob: https://*.crisp.chat; form-action 'self' mailto: https://formspree.io https://api.web3forms.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://*.crisp.chat https://*.googletagmanager.com; style-src 'self' 'unsafe-inline' https://*.crisp.chat; img-src 'self' data: https://*.crisp.chat https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self' https://*.crisp.chat; media-src 'self' https://*.crisp.chat; connect-src 'self' https://*.crisp.chat wss://*.relay.crisp.chat wss://*.relay.rescue.crisp.chat https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self' https://*.crisp.chat https://*.crisp.help; worker-src 'self' blob: https://*.crisp.chat; form-action 'self' mailto: https://formspree.io https://api.web3forms.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
 ```
 
 4. Mục **Custom headers** → **Add header** hai lần (tick Origin override):
