@@ -10,6 +10,8 @@ import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import ChatWidget from '../components/layout/ChatWidget.astro';
 import GoogleAnalytics from '../components/layout/GoogleAnalytics.astro';
+import ConsentScript from '../components/consent/ConsentScript.astro';
+import CookieConsent from '../components/consent/CookieConsent.astro';
 import { organizationSchema, websiteSchema } from '../lib/json-ld-schema-builders';
 
 type Props = SeoProps;
@@ -26,6 +28,7 @@ const jsonLd = [organizationSchema(), websiteSchema(), ...(props.jsonLd ?? [])];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <ConsentScript />
     <GoogleAnalytics />
     <meta name="theme-color" content="#f8f7f3" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#06120c" media="(prefers-color-scheme: dark)" />
@@ -52,6 +55,7 @@ const jsonLd = [organizationSchema(), websiteSchema(), ...(props.jsonLd ?? [])];
       <slot />
     </main>
     <Footer />
+    <CookieConsent />
     <ChatWidget />
   </body>
 </html>

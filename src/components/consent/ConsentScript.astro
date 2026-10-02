@@ -1,0 +1,77 @@
+---
+/**
+ * Consent core, inlined in <head> before any third-party script.
+ * Exposes `window.siteConsent`:
+ *   on(category, fn)  run fn now if consented, otherwise once consent is given
+ *   has(category)     boolean
+ *   get()             stored choice or null (null = not asked yet → banner shows)
+ *   set({ functional, analytics })
+ *
+ * Categories: "functional" (Crisp live chat), "analytics" (Google Analytics).
+ * Strictly necessary storage (this choice itself) needs no consent.
+ * Nothing in a category loads before it is granted (GDPR / ePrivacy art. 5(3)).
+ * The choice expires after 12 months (CNIL: max 13) or when CONSENT_VERSION changes;
+ * bump it whenever a new category or vendor is added so everyone is asked again.
+ * Withdrawing a category clears its cookies and reloads so loaded scripts stop.
+ */
+const CONSENT_VERSION = 1;
+---
+
+<script is:inline define:vars={{ CONSENT_VERSION }}>
+  (() => {
+    const KEY = 'ezorder-consent';
+    const MAX_AGE = 365 * 24 * 60 * 60 * 1000;
+    const CATEGORIES = ['functional', 'analytics'];
+    const COOKIES = { functional: /^crisp-client/, analytics: /^_ga/ };
+    const waiting = { functional: [], analytics: [] };
+    let state = null;
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (saved && saved.v === CONSENT_VERSION && Date.now() - saved.t < MAX_AGE) state = saved;
+    } catch {}
+
+    const clearCookies = (pattern) => {
+      const host = location.hostname;
+      const domains = ['', host, '.' + host, '.' + host.split('.').slice(-2).join('.')];
+      document.cookie.split(';').forEach((c) => {
+        const name = c.split('=')[0].trim();
+        if (!pattern.test(name)) return;
+        domains.forEach((d) => {
+          document.cookie = name + '=; Max-Age=0; path=/' + (d ? '; domain=' + d : '');
+        });
+      });
+    };
+
+    const api = {
+      get: () => state,
+      has: (category) => !!(state && state[category]),
+      on(category, fn) {
+        if (api.has(category)) fn();
+        else waiting[category].push(fn);
+      },
+      set(choice) {
+        const prev = state;
+        state = { v: CONSENT_VERSION, t: Date.now() };
+        CATEGORIES.forEach((c) => (state[c] = !!choice[c]));
+        try {
+          localStorage.setItem(KEY, JSON.stringify(state));
+        } catch {}
+        document.dispatchEvent(new CustomEvent('consent:change', { detail: state }));
+
+        const revoked = CATEGORIES.filter((c) => prev && prev[c] && !state[c]);
+        if (revoked.length) {
+          revoked.forEach((c) => clearCookies(COOKIES[c]));
+          location.reload();
+          return;
+        }
+        CATEGORIES.forEach((c) => {
+          if (!state[c]) return;
+          const fns = waiting[c].splice(0);
+          fns.forEach((fn) => fn());
+        });
+      },
+    };
+    window.siteConsent = api;
+  })();
+</script>

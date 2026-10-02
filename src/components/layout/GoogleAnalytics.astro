@@ -1,25 +1,37 @@
 ---
 /**
- * Google Analytics 4 tag (gtag.js), loaded on every page from BaseLayout.
- * Production builds only, so `astro dev` traffic stays out of the reports.
- * is:inline keeps Google's snippet as classic scripts (gtag must stay a global).
+ * Google Analytics 4 tag (gtag.js), production builds only so `astro dev` traffic stays out of reports.
+ *
+ * Consent-gated: gtag.js is not requested until the visitor grants "analytics"
+ * (components/consent/). Consent Mode v2 signals are sent with it: analytics granted,
+ * all advertising storage/signals denied — this site runs no ads tags.
  * Its domains are allowed in the CloudFront CSP (infra/cloudformation-website-hosting.yml).
  */
+const GA_ID = 'G-H6Q84LKEN3';
 ---
 
 {
   import.meta.env.PROD && (
-    <>
-      <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-H6Q84LKEN3" />
-      <script is:inline>
+    <script is:inline define:vars={{ GA_ID }}>
+      window.siteConsent.on('analytics', () => {
         window.dataLayer = window.dataLayer || [];
         function gtag() {
           dataLayer.push(arguments);
         }
+        window.gtag = gtag;
+        gtag('consent', 'default', {
+          analytics_storage: 'granted',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+        });
         gtag('js', new Date());
-
-        gtag('config', 'G-H6Q84LKEN3');
-      </script>
-    </>
+        gtag('config', GA_ID);
+        const s = document.createElement('script');
+        s.async = true;
+        s.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+        document.head.appendChild(s);
+      });
+    </script>
   )
 }

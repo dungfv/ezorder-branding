@@ -239,13 +239,17 @@ Coordinate with the pending SES setup for `mailer.ezorder.io`: add its DKIM/SPF 
 
 Non-mailto providers include a honeypot field. The CSP `form-action` (CloudFront headers policy) already allows Formspree and Web3Forms.
 
+## Cookie consent (EU)
+
+`src/components/consent/`: `ConsentScript.astro` (in `<head>`, exposes `window.siteConsent`) and `CookieConsent.astro` (fixed bottom banner + settings dialog, reopened by "Cookie settings" in the footer). "Reject all" sits next to "Accept all" with equal weight; categories start unticked; the choice lasts 12 months. Withdrawing a category clears its cookies and reloads. Adding a new tracker: gate it with `siteConsent.on('<category>', …)`, list its cookies in the dialog table and bump `CONSENT_VERSION` so everyone is asked again.
+
 ## Live chat (Crisp)
 
-`src/components/layout/ChatWidget.astro` holds the Crisp embed (website ID inside) and is rendered on every page by `BaseLayout`. The CloudFront CSP allows Crisp's domains (`*.crisp.chat`, `wss://*.relay.crisp.chat`, `*.crisp.help`, per Crisp's CSP guide). To remove the widget, delete `<ChatWidget />` from `BaseLayout`.
+`src/components/layout/ChatWidget.astro` (website ID `481ec1eb-…`). Consent category **functional**: Crisp is not requested until the visitor allows it. Links with `data-open-chat` open the chat (or Cookie settings first, without consent). The CloudFront CSP allows Crisp's domains (`*.crisp.chat`, `wss://*.relay.crisp.chat`, `*.crisp.help`, per Crisp's CSP guide). To remove the widget, delete `<ChatWidget />` from `BaseLayout` and its row in the consent dialog.
 
 ## Analytics (Google Analytics 4)
 
-`src/components/layout/GoogleAnalytics.astro` holds the gtag.js snippet (measurement ID inside) and is rendered in the `<head>` of every page by `BaseLayout`, in production builds only. The CloudFront CSP allows Google's domains (`*.googletagmanager.com`, `*.google-analytics.com`, `*.analytics.google.com`, per Google's CSP guide). To remove it, delete `<GoogleAnalytics />` from `BaseLayout`.
+`src/components/layout/GoogleAnalytics.astro` (`G-H6Q84LKEN3`), production builds only. Consent category **analytics**: gtag.js loads only after consent, with Consent Mode v2 (analytics granted, ads denied). The CloudFront CSP allows Google's domains (`*.googletagmanager.com`, `*.google-analytics.com`, `*.analytics.google.com`). To remove it, delete `<GoogleAnalytics />` from `BaseLayout` and its row in the consent dialog.
 
 ## SEO
 

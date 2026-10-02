@@ -1,0 +1,218 @@
+---
+/**
+ * Cookie banner (fixed, bottom) + preferences dialog.
+ *
+ * EU requirements this follows (GDPR, ePrivacy, EDPB guidelines 05/2020 & 03/2022, CNIL):
+ * - Nothing non-essential runs before a choice (see ConsentScript / GA / ChatWidget).
+ * - "Reject all" is on the first layer with the same weight as "Accept all".
+ * - Granular, per-purpose choices; no pre-ticked boxes; necessary storage is explained.
+ * - Not a cookie wall: the site stays usable while the banner is open.
+ * - Withdrawing is as easy as consenting: "Cookie settings" in the footer reopens this dialog.
+ *
+ * Keep the vendor table in sync with what the site actually loads. Hidden until the
+ * script decides it is needed, so visitors without JS (who get no trackers) never see it.
+ */
+interface Vendor {
+  name: string;
+  provider: string;
+  purpose: string;
+  duration: string;
+}
+
+const categories: {
+  id: 'necessary' | 'functional' | 'analytics';
+  title: string;
+  body: string;
+  vendors: Vendor[];
+}[] = [
+  {
+    id: 'necessary',
+    title: 'Strictly necessary',
+    body: 'Required for the site to work and to remember your cookie choice. They don’t track you and can’t be switched off.',
+    vendors: [{ name: 'ezorder-consent (local storage)', provider: 'EZ Order', purpose: 'Stores your cookie choices', duration: '12 months' }],
+  },
+  {
+    id: 'functional',
+    title: 'Functional',
+    body: 'Enable live chat with our support team, so conversations continue across pages and visits.',
+    vendors: [{ name: 'crisp-client/*', provider: 'Crisp (live chat)', purpose: 'Keeps your chat session', duration: '6 months' }],
+  },
+  {
+    id: 'analytics',
+    title: 'Analytics',
+    body: 'Help us understand which pages are useful and how visitors find us, using aggregated statistics. We don’t use them for advertising.',
+    vendors: [
+      { name: '_ga', provider: 'Google Analytics', purpose: 'Distinguishes visitors', duration: '2 years' },
+      { name: '_ga_H6Q84LKEN3', provider: 'Google Analytics', purpose: 'Keeps session state', duration: '2 years' },
+    ],
+  },
+];
+
+const btn =
+  'inline-flex h-11 items-center justify-center rounded-md px-5 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors';
+---
+
+<section
+  id="cookie-banner"
+  aria-label="Cookie consent"
+  class="fixed inset-x-0 bottom-0 z-[60] border-t border-brand-line bg-brand text-on-brand shadow-[0_-12px_32px_-12px_rgb(0_0_0/0.4)]"
+  hidden
+>
+  <div class="mx-auto max-w-[100rem] px-4 py-5 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+      <p class="max-w-5xl text-[0.9375rem] leading-relaxed">
+        We use cookies and similar technologies to run live chat and to analyse how our site is used. Click
+        “Accept all” to allow them, “Reject all” to keep only strictly necessary cookies, or “Customize” to choose. You
+        can change your mind at any time via “Cookie settings” at the bottom of every page.
+      </p>
+      <div class="grid shrink-0 grid-cols-2 gap-3 sm:flex">
+        <button type="button" class:list={[btn, 'col-span-2 bg-white text-brand hover:bg-white/90 sm:order-none']} data-consent-customize>
+          Customize
+        </button>
+        <button type="button" class:list={[btn, 'bg-white text-brand hover:bg-white/90']} data-consent-reject>Reject all</button>
+        <button type="button" class:list={[btn, 'bg-white text-brand hover:bg-white/90']} data-consent-accept>Accept all</button>
+      </div>
+    </div>
+    <p class="mt-3 flex flex-wrap justify-end gap-x-5 gap-y-1 text-sm">
+      <a href="/privacy-policy/" class="underline underline-offset-4 hover:text-mint">See our Privacy Policy</a>
+      <a href="/terms/" class="underline underline-offset-4 hover:text-mint">Terms of Service</a>
+    </p>
+  </div>
+</section>
+
+<dialog
+  id="cookie-preferences"
+  aria-labelledby="cookie-preferences-title"
+  class="m-auto w-[min(40rem,calc(100%-2rem))] rounded-2xl border border-line bg-surface p-0 text-fg shadow-float backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+>
+  <form method="dialog" class="flex max-h-[85dvh] flex-col">
+    <header class="flex items-start justify-between gap-4 border-b border-line px-6 py-5">
+      <div>
+        <h2 id="cookie-preferences-title" class="text-xl font-semibold tracking-tight">Cookie settings</h2>
+        <p class="mt-1 text-sm text-muted">
+          Choose which cookies we may use. Your choice applies to this browser for 12 months.{' '}
+          <a href="/privacy-policy/" class="text-accent underline underline-offset-4">Privacy Policy</a>
+        </p>
+      </div>
+      <button type="submit" value="close" class="grid size-9 shrink-0 place-items-center rounded-full text-muted hover:bg-surface-muted hover:text-fg" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
+      </button>
+    </header>
+
+    <div class="flex-1 space-y-3 overflow-y-auto px-6 py-5">
+      {
+        categories.map((c) => (
+          <section class="rounded-xl border border-line p-4" aria-labelledby={`consent-${c.id}-label`}>
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 id={`consent-${c.id}-label`} class="font-semibold">{c.title}</h3>
+                <p class="mt-1 text-sm leading-relaxed text-muted" id={`consent-${c.id}-desc`}>{c.body}</p>
+              </div>
+              {c.id === 'necessary' ? (
+                <span class="shrink-0 pt-0.5 font-mono text-xs text-accent">Always on</span>
+              ) : (
+                <label class="relative inline-flex shrink-0 cursor-pointer items-center">
+                  <input
+                    type="checkbox"
+                    class="peer sr-only"
+                    name={c.id}
+                    data-consent-toggle={c.id}
+                    aria-labelledby={`consent-${c.id}-label`}
+                    aria-describedby={`consent-${c.id}-desc`}
+                  />
+                  <span class="h-6 w-11 rounded-full bg-line-strong transition-colors peer-checked:bg-mint peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--c-focus)]" />
+                  <span class="absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+                </label>
+              )}
+            </div>
+            <details class="mt-3 text-sm">
+              <summary class="cursor-pointer text-accent">Cookies used ({c.vendors.length})</summary>
+              <div class="mt-2 overflow-x-auto">
+                <table class="w-full min-w-[28rem] text-left text-xs">
+                  <thead class="text-muted">
+                    <tr>
+                      <th class="py-1.5 pr-3 font-medium">Name</th>
+                      <th class="py-1.5 pr-3 font-medium">Provider</th>
+                      <th class="py-1.5 pr-3 font-medium">Purpose</th>
+                      <th class="py-1.5 font-medium">Expires</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-line">
+                    {c.vendors.map((v) => (
+                      <tr>
+                        <td class="py-1.5 pr-3 font-mono">{v.name}</td>
+                        <td class="py-1.5 pr-3">{v.provider}</td>
+                        <td class="py-1.5 pr-3">{v.purpose}</td>
+                        <td class="py-1.5">{v.duration}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          </section>
+        ))
+      }
+    </div>
+
+    <footer class="grid gap-2 border-t border-line px-6 py-4 sm:grid-cols-3">
+      <button type="submit" value="reject" class:list={[btn, 'bg-fg text-bg hover:opacity-90']}>Reject all</button>
+      <button type="submit" value="accept" class:list={[btn, 'bg-fg text-bg hover:opacity-90']}>Accept all</button>
+      <button type="submit" value="save" class:list={[btn, 'ring-1 ring-line-strong hover:ring-fg/40']}>Confirm my choices</button>
+    </footer>
+  </form>
+</dialog>
+
+<script is:inline>
+  (() => {
+    const consent = window.siteConsent;
+    const banner = document.getElementById('cookie-banner');
+    const dialog = document.getElementById('cookie-preferences');
+    if (!consent || !banner || !dialog) return;
+    const toggles = dialog.querySelectorAll('[data-consent-toggle]');
+
+    const showBanner = (show) => {
+      banner.hidden = !show;
+      // Keep the end of the page reachable above the fixed banner.
+      document.body.style.paddingBottom = show ? banner.offsetHeight + 'px' : '';
+    };
+    const choose = (choice) => {
+      consent.set(choice);
+      showBanner(false);
+    };
+    const openSettings = () => {
+      const state = consent.get();
+      // No pre-ticked boxes: unset categories start off.
+      toggles.forEach((t) => (t.checked = !!(state && state[t.dataset.consentToggle])));
+      dialog.showModal();
+    };
+
+    banner.querySelector('[data-consent-accept]').addEventListener('click', () => choose({ functional: true, analytics: true }));
+    banner.querySelector('[data-consent-reject]').addEventListener('click', () => choose({ functional: false, analytics: false }));
+    banner.querySelector('[data-consent-customize]').addEventListener('click', openSettings);
+
+    dialog.addEventListener('close', () => {
+      const action = dialog.returnValue;
+      if (action === 'accept') choose({ functional: true, analytics: true });
+      else if (action === 'reject') choose({ functional: false, analytics: false });
+      else if (action === 'save') {
+        const choice = {};
+        toggles.forEach((t) => (choice[t.dataset.consentToggle] = t.checked));
+        choose(choice);
+      }
+      dialog.returnValue = '';
+    });
+
+    // "Cookie settings" links anywhere on the page, and requests from features that need consent.
+    document.addEventListener('click', (e) => {
+      if (e.target instanceof Element && e.target.closest('[data-cookie-settings]')) {
+        e.preventDefault();
+        openSettings();
+      }
+    });
+    document.addEventListener('consent:open', openSettings);
+
+    if (!consent.get()) showBanner(true);
+    addEventListener('resize', () => !banner.hidden && showBanner(true));
+  })();
+</script>
